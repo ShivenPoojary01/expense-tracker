@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="light">
-
-<head>
-    <meta charset="UTF-8">
+<head>    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExpenSight Pro - Daily Expense Tracker & Excel Generator</title>
-
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -35,24 +33,24 @@
             }
         }
     </script>
-
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <!-- GSAP for Animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
+    
     <!-- SheetJS for Excel Import/Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+    
     <!-- Chart.js for Data Visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -87,17 +85,14 @@
             width: 6px;
             height: 6px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 8px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 8px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
@@ -119,23 +114,20 @@
         }
     </style>
 </head>
-
 <body class="min-h-screen pb-12 antialiased selection:bg-brand-500 selection:text-white">
 
     <!-- Header Navigation -->
     <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200/80 mb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-
+                
                 <!-- Brand Logo -->
                 <div class="flex items-center gap-3 cursor-pointer logo-btn">
-                    <div
-                        class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
                         <i class="fa-solid me-0 fa-wallet text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-800">Expen<span
-                                class="gradient-text">Sight</span></h1>
+                        <h1 class="text-xl font-bold tracking-tight text-slate-800">Expen<span class="gradient-text">Sight</span></h1>
                         <p class="text-xs font-medium text-slate-400">Daily Tracker & Excel Analytics</p>
                     </div>
                 </div>
@@ -143,40 +135,32 @@
                 <!-- Top Quick Actions -->
                 <div class="flex items-center gap-3">
                     <!-- Cloud Sync Indicator Badge -->
-                    <div id="sync-status-badge"
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600"
-                        title="Data Storage Status">
+                    <div id="sync-status-badge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600" title="Data Storage Status">
                         <i id="sync-icon" class="fa-solid fa-hard-drive text-amber-500"></i>
                         <span id="sync-text">Local Storage</span>
                     </div>
 
-                    <div id="user-profile-badge"
-                        class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
-                        <div
-                            class="w-6 h-6 rounded-full bg-brand-500 text-white flex items-center justify-center text-[10px]">
+                    <div id="user-profile-badge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
+                        <div class="w-6 h-6 rounded-full bg-brand-500 text-white flex items-center justify-center text-[10px]">
                             <i class="fa-solid fa-user"></i>
                         </div>
                         <span id="header-username">Guest</span>
-                        <button id="logout-btn" title="Log Out / Switch User"
-                            class="ml-1 text-slate-400 hover:text-rose-500 transition-colors">
+                        <button id="logout-btn" title="Log Out / Switch User" class="ml-1 text-slate-400 hover:text-rose-500 transition-colors">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </button>
                     </div>
 
-                    <button id="import-btn"
-                        class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-medium text-sm transition-all shadow-sm">
+                    <button id="import-btn" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-medium text-sm transition-all shadow-sm">
                         <i class="fa-solid fa-file-import text-brand-600"></i>
                         <span>Import Excel</span>
                     </button>
 
-                    <button id="export-excel-btn"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-semibold text-sm transition-all shadow-sm active:scale-95">
+                    <button id="export-excel-btn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-semibold text-sm transition-all shadow-sm active:scale-95">
                         <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
                         <span>Export Excel Sheet</span>
                     </button>
 
-                    <button id="open-add-modal-btn"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-sm shadow-md shadow-brand-500/20 transition-all active:scale-95">
+                    <button id="open-add-modal-btn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-sm shadow-md shadow-brand-500/20 transition-all active:scale-95">
                         <i class="fa-solid fa-plus text-xs"></i>
                         <span class="hidden sm:inline">Add Expense</span>
                     </button>
@@ -190,10 +174,9 @@
 
         <!-- Top Overview Stats Cards -->
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-
+            
             <!-- Total Spent Card -->
-            <div
-                class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Spent</span>
                     <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
@@ -210,8 +193,7 @@
             </div>
 
             <!-- Daily Average Card -->
-            <div
-                class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Daily Average</span>
                     <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
@@ -228,8 +210,7 @@
             </div>
 
             <!-- Top Category Card -->
-            <div
-                class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Top Category</span>
                     <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
@@ -246,12 +227,10 @@
             </div>
 
             <!-- Budget Progress Card -->
-            <div
-                class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Monthly Budget</span>
-                    <button id="set-budget-btn"
-                        class="text-xs text-brand-600 hover:text-brand-700 font-medium underline">
+                    <button id="set-budget-btn" class="text-xs text-brand-600 hover:text-brand-700 font-medium underline">
                         Set Cap
                     </button>
                 </div>
@@ -259,11 +238,10 @@
                     <span id="stat-budget-spent" class="text-lg font-bold text-slate-800">$0</span>
                     <span id="stat-budget-limit" class="text-xs text-slate-400">of $2,500 budget</span>
                 </div>
-
+                
                 <!-- Budget Progress Bar -->
                 <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div id="budget-progress-bar" class="h-full bg-brand-500 rounded-full transition-all duration-500"
-                        style="width: 0%"></div>
+                    <div id="budget-progress-bar" class="h-full bg-brand-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
                 <p id="budget-status-text" class="text-xs font-medium text-emerald-600 mt-2 flex items-center gap-1">
                     <i class="fa-solid fa-circle-check"></i> Within safe spending limit
@@ -274,7 +252,7 @@
 
         <!-- Charts Section -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
+            
             <!-- Category Breakdown Doughnut -->
             <div class="glass-card rounded-2xl p-6 flex flex-col">
                 <div class="flex items-center justify-between mb-4">
@@ -299,8 +277,7 @@
                         <p class="text-xs text-slate-400">Daily expenses progression over time</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span
-                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200">
                             <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span> Live Sync
                         </span>
                     </div>
@@ -314,34 +291,30 @@
 
         <!-- Main Expense Table & Filtering Section -->
         <section class="glass-card rounded-2xl overflow-hidden shadow-sm">
-
+            
             <!-- Filter & Action Bar Header -->
-            <div
-                class="p-5 border-b border-slate-200/80 bg-slate-50/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-
+            <div class="p-5 border-b border-slate-200/80 bg-slate-50/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                
                 <!-- Left Title & Counter -->
                 <div class="flex items-center gap-3">
                     <h3 class="font-bold text-slate-800 text-lg">Expense Log</h3>
-                    <span id="filtered-badge"
-                        class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">
+                    <span id="filtered-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">
                         Showing all
                     </span>
                 </div>
 
                 <!-- Controls & Filters Group -->
                 <div class="flex flex-wrap items-center gap-3">
-
+                    
                     <!-- Search Input -->
                     <div class="relative min-w-[200px] flex-1 sm:flex-none">
-                        <i
-                            class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="text" id="search-input" placeholder="Search description..."
-                            class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="search-input" placeholder="Search description..." 
+                               class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
                     </div>
 
                     <!-- Category Filter -->
-                    <select id="filter-category"
-                        class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <select id="filter-category" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
                         <option value="ALL">All Categories</option>
                         <option value="Food & Dining">Food & Dining</option>
                         <option value="Transportation">Transportation</option>
@@ -355,8 +328,7 @@
                     </select>
 
                     <!-- Payment Method Filter -->
-                    <select id="filter-payment"
-                        class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <select id="filter-payment" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
                         <option value="ALL">All Payments</option>
                         <option value="Credit Card">Credit Card</option>
                         <option value="Debit Card">Debit Card</option>
@@ -365,16 +337,14 @@
                     </select>
 
                     <!-- Reset Filters Button -->
-                    <button id="reset-filters-btn" title="Reset Filters"
-                        class="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-100 text-xs transition-all">
+                    <button id="reset-filters-btn" title="Reset Filters" class="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-100 text-xs transition-all">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
 
                     <div class="h-5 w-px bg-slate-300 hidden sm:block"></div>
 
                     <!-- Clear All Data Button -->
-                    <button id="clear-data-btn"
-                        class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 transition-colors">
+                    <button id="clear-data-btn" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 transition-colors">
                         Clear All
                     </button>
                 </div>
@@ -384,8 +354,7 @@
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse min-w-[700px]">
                     <thead>
-                        <tr
-                            class="bg-slate-100/60 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                        <tr class="bg-slate-100/60 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                             <th class="py-3.5 px-5 cursor-pointer hover:text-slate-800" onclick="sortTable('date')">
                                 Date <i class="fa-solid fa-sort text-[10px] ml-1"></i>
                             </th>
@@ -394,8 +363,7 @@
                             </th>
                             <th class="py-3.5 px-5">Description</th>
                             <th class="py-3.5 px-5">Method</th>
-                            <th class="py-3.5 px-5 text-right cursor-pointer hover:text-slate-800"
-                                onclick="sortTable('amount')">
+                            <th class="py-3.5 px-5 text-right cursor-pointer hover:text-slate-800" onclick="sortTable('amount')">
                                 Amount <i class="fa-solid fa-sort text-[10px] ml-1"></i>
                             </th>
                             <th class="py-3.5 px-5 text-center">Actions</th>
@@ -409,22 +377,18 @@
 
             <!-- Empty State Display -->
             <div id="empty-state" class="hidden py-16 text-center">
-                <div
-                    class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+                <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl">
                     <i class="fa-solid fa-folder-open"></i>
                 </div>
                 <h4 class="text-base font-semibold text-slate-700 mb-1">No expenses found</h4>
-                <p class="text-xs text-slate-400 max-w-sm mx-auto mb-5">Start tracking your daily expenses or adjust
-                    your current filter choices.</p>
-                <button onclick="document.getElementById('open-add-modal-btn').click()"
-                    class="px-4 py-2 rounded-xl bg-brand-600 text-white font-medium text-xs shadow hover:bg-brand-700 transition-all">
+                <p class="text-xs text-slate-400 max-w-sm mx-auto mb-5">Start tracking your daily expenses or adjust your current filter choices.</p>
+                <button onclick="document.getElementById('open-add-modal-btn').click()" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-medium text-xs shadow hover:bg-brand-700 transition-all">
                     + Add New Expense
                 </button>
             </div>
 
             <!-- Table Footer Stats -->
-            <div
-                class="p-4 bg-slate-50/80 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <div class="p-4 bg-slate-50/80 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
                 <span id="table-summary-count">Showing 0 of 0 entries</span>
                 <div class="font-semibold text-slate-700 flex items-center gap-2">
                     <span>Filtered Total:</span>
@@ -442,13 +406,10 @@
     </footer>
 
     <!-- ADD / EDIT EXPENSE MODAL -->
-    <div id="expense-modal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="expense-modal-card"
-            class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl transform scale-90 transition-transform duration-300 relative">
-
-            <button id="close-modal-btn"
-                class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors">
+    <div id="expense-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="expense-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl transform scale-90 transition-transform duration-300 relative">
+            
+            <button id="close-modal-btn" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -462,30 +423,26 @@
 
                 <!-- Amount Field -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Amount
-                        ($)</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Amount ($)</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-lg">$</span>
                         <input type="number" step="0.01" min="0.01" id="form-amount" placeholder="0.00" required
-                            class="w-full pl-9 pr-4 py-3 text-lg font-bold rounded-2xl border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                               class="w-full pl-9 pr-4 py-3 text-lg font-bold rounded-2xl border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
                     </div>
                 </div>
 
                 <!-- Description -->
                 <div>
-                    <label
-                        class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Description</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Description</label>
                     <input type="text" id="form-description" placeholder="e.g. Grocery shopping at Target" required
-                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
                 <!-- Category & Payment Method Row -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label
-                            class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Category</label>
-                        <select id="form-category" required
-                            class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Category</label>
+                        <select id="form-category" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
                             <option value="Food & Dining">Food & Dining</option>
                             <option value="Transportation">Transportation</option>
                             <option value="Shopping">Shopping</option>
@@ -499,11 +456,8 @@
                     </div>
 
                     <div>
-                        <label
-                            class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Payment
-                            Method</label>
-                        <select id="form-payment" required
-                            class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Payment Method</label>
+                        <select id="form-payment" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
                             <option value="Credit Card">Credit Card</option>
                             <option value="Debit Card">Debit Card</option>
                             <option value="UPI / Bank">UPI / Bank</option>
@@ -514,20 +468,17 @@
 
                 <!-- Date Picker -->
                 <div>
-                    <label
-                        class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Date</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Date</label>
                     <input type="date" id="form-date" required
-                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
                 </div>
 
                 <!-- Modal Action Buttons -->
                 <div class="pt-4 flex items-center justify-end gap-3">
-                    <button type="button" id="cancel-modal-btn"
-                        class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium text-sm transition-all">
+                    <button type="button" id="cancel-modal-btn" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium text-sm transition-all">
                         Cancel
                     </button>
-                    <button type="submit" id="save-expense-btn"
-                        class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-sm shadow-lg shadow-brand-500/20 transition-all">
+                    <button type="submit" id="save-expense-btn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-sm shadow-lg shadow-brand-500/20 transition-all">
                         Save Expense
                     </button>
                 </div>
@@ -536,13 +487,10 @@
     </div>
 
     <!-- IMPORT EXCEL MODAL -->
-    <div id="import-modal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="import-modal-card"
-            class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl transform scale-90 transition-transform duration-300 relative">
-
-            <button id="close-import-modal-btn"
-                class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center">
+    <div id="import-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="import-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl transform scale-90 transition-transform duration-300 relative">
+            
+            <button id="close-import-modal-btn" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -552,10 +500,8 @@
             </div>
 
             <!-- Drag & Drop Area -->
-            <div id="drop-zone"
-                class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center cursor-pointer hover:border-brand-500 transition-all bg-slate-50/50">
-                <div
-                    class="w-12 h-12 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto mb-3 text-xl">
+            <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center cursor-pointer hover:border-brand-500 transition-all bg-slate-50/50">
+                <div class="w-12 h-12 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto mb-3 text-xl">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                 </div>
                 <p class="text-sm font-semibold text-slate-700 mb-1">Click to browse or drag & drop</p>
@@ -564,19 +510,15 @@
             </div>
 
             <div class="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-                <p class="font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> Excel Column
-                    Guidelines:</p>
-                <p class="mt-1 text-amber-700">Ensure columns include headers like: <strong>Date, Category, Description,
-                        Amount, Method</strong>.</p>
+                <p class="font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> Excel Column Guidelines:</p>
+                <p class="mt-1 text-amber-700">Ensure columns include headers like: <strong>Date, Category, Description, Amount, Method</strong>.</p>
             </div>
 
             <div class="mt-6 flex justify-between items-center">
-                <button id="download-template-btn"
-                    class="text-xs text-brand-600 hover:text-brand-700 font-semibold underline flex items-center gap-1">
+                <button id="download-template-btn" class="text-xs text-brand-600 hover:text-brand-700 font-semibold underline flex items-center gap-1">
                     <i class="fa-solid fa-download"></i> Download Sample Excel
                 </button>
-                <button id="close-import-btn"
-                    class="px-5 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-medium">
+                <button id="close-import-btn" class="px-5 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-medium">
                     Close
                 </button>
             </div>
@@ -584,22 +526,18 @@
     </div>
 
     <!-- CUSTOM CONFIRMATION MODAL -->
-    <div id="confirm-modal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center relative">
-            <div
-                class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4 text-xl">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4 text-xl">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <h3 id="confirm-title" class="text-lg font-bold text-slate-800">Are you sure?</h3>
             <p id="confirm-msg" class="text-xs text-slate-500 mt-2 mb-6">This action cannot be undone.</p>
             <div class="flex items-center gap-3">
-                <button id="confirm-cancel-btn"
-                    class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold">
+                <button id="confirm-cancel-btn" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold">
                     Cancel
                 </button>
-                <button id="confirm-action-btn"
-                    class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-md shadow-rose-500/20">
+                <button id="confirm-action-btn" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-md shadow-rose-500/20">
                     Confirm
                 </button>
             </div>
@@ -607,77 +545,63 @@
     </div>
 
     <!-- USER LOGIN / SIGN UP MODAL -->
-    <div id="auth-modal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay transition-opacity duration-300">
+    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay transition-opacity duration-300">
         <div id="auth-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
-
+            
             <div class="text-center mb-6">
-                <div
-                    class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-brand-500/20 mx-auto mb-3">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-brand-500/20 mx-auto mb-3">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h2 class="text-2xl font-extrabold text-slate-800">Welcome to Expen<span
-                        class="gradient-text">Sight</span></h2>
-                <p class="text-xs text-slate-400 mt-1">Sign in to access your personal expenses or create a new account
-                </p>
+                <h2 class="text-2xl font-extrabold text-slate-800">Welcome to Expen<span class="gradient-text">Sight</span></h2>
+                <p class="text-xs text-slate-400 mt-1">Sign in to access your personal expenses or create a new account</p>
             </div>
 
             <!-- Tab Buttons -->
             <div class="flex rounded-2xl bg-slate-100 p-1 mb-6">
-                <button id="auth-tab-login"
-                    class="flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm">
+                <button id="auth-tab-login" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm">
                     Log In
                 </button>
-                <button id="auth-tab-signup"
-                    class="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all">
+                <button id="auth-tab-signup" class="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all">
                     Create Account
                 </button>
             </div>
 
             <!-- Auth Error Alert Box -->
-            <div id="auth-error-box"
-                class="hidden mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
+            <div id="auth-error-box" class="hidden mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
                 <i class="fa-solid fa-circle-exclamation text-rose-500 text-sm"></i>
                 <span id="auth-error-msg">Invalid credentials</span>
             </div>
 
             <form id="auth-form" class="space-y-4">
                 <div>
-                    <label
-                        class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Username</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Username</label>
                     <div class="relative">
-                        <i
-                            class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                         <input type="text" id="auth-username" required placeholder="e.g. alex_smith"
-                            class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                               class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                 </div>
 
                 <div>
-                    <label
-                        class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Password</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Password</label>
                     <div class="relative">
-                        <i
-                            class="fa-solid fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <i class="fa-solid fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                         <input type="password" id="auth-password" required placeholder="••••••••"
-                            class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                               class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                 </div>
 
                 <!-- Confirm Password Field (Only for Sign Up) -->
                 <div id="confirm-password-container" class="hidden">
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Confirm
-                        Password</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Confirm Password</label>
                     <div class="relative">
-                        <i
-                            class="fa-solid fa-shield-halved absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <i class="fa-solid fa-shield-halved absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                         <input type="password" id="auth-confirm-password" placeholder="••••••••"
-                            class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                               class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                 </div>
 
-                <button type="submit" id="auth-submit-btn"
-                    class="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-lg shadow-brand-500/20 transition-all active:scale-95 mt-2 flex items-center justify-center gap-2">
+                <button type="submit" id="auth-submit-btn" class="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-lg shadow-brand-500/20 transition-all active:scale-95 mt-2 flex items-center justify-center gap-2">
                     <span id="auth-btn-text">Log In</span>
                     <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
@@ -686,8 +610,7 @@
     </div>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast"
-        class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-slate-900 text-white shadow-2xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300">
+    <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-slate-900 text-white shadow-2xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300">
         <div id="toast-icon" class="text-emerald-400 text-base">
             <i class="fa-solid fa-circle-check"></i>
         </div>
@@ -703,11 +626,11 @@
         // =========================================================================
         const MY_FIREBASE_CONFIG = {
             apiKey: "AIzaSyDfDrFU3W3CVtWpvM059FOtH3US3j--5oQ",
-            authDomain: "myexpensetracker-9ae12.firebaseapp.com",
-            projectId: "myexpensetracker-9ae12",
-            storageBucket: "myexpensetracker-9ae12.firebasestorage.app",
-            messagingSenderId: "150049824216",
-            appId: "1:150049824216:web:2b8439b06e67832ab9e6ad"
+    authDomain: "myexpensetracker-9ae12.firebaseapp.com",
+    projectId: "myexpensetracker-9ae12",
+    storageBucket: "myexpensetracker-9ae12.firebasestorage.app",
+    messagingSenderId: "150049824216",
+    appId: "1:150049824216:web:2b8439b06e67832ab9e6ad"
         };
 
         // Global Application State & Storage References
@@ -754,6 +677,165 @@
             await setupFirebaseAndAuth();
         });
 
+        function setupEventListeners() {
+            // Auth Tab Switching (Log In vs Create Account)
+            const loginTab = document.getElementById('auth-tab-login');
+            const signupTab = document.getElementById('auth-tab-signup');
+            const confirmPassContainer = document.getElementById('confirm-password-container');
+            const authBtnText = document.getElementById('auth-btn-text');
+            const authErrorBox = document.getElementById('auth-error-box');
+
+            if (loginTab && signupTab) {
+                loginTab.addEventListener('click', () => {
+                    isSignUpMode = false;
+                    loginTab.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm';
+                    signupTab.className = 'flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
+                    if (confirmPassContainer) confirmPassContainer.classList.add('hidden');
+                    if (authBtnText) authBtnText.innerText = 'Log In';
+                    if (authErrorBox) authErrorBox.classList.add('hidden');
+                });
+
+                signupTab.addEventListener('click', () => {
+                    isSignUpMode = true;
+                    signupTab.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm';
+                    loginTab.className = 'flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
+                    if (confirmPassContainer) confirmPassContainer.classList.remove('hidden');
+                    if (authBtnText) authBtnText.innerText = 'Create Account';
+                    if (authErrorBox) authErrorBox.classList.add('hidden');
+                });
+            }
+
+            // Auth Form Submission
+            const authForm = document.getElementById('auth-form');
+            if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
+
+            // Logout Button
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+
+            // Expense Modals
+            const openAddBtn = document.getElementById('open-add-modal-btn');
+            if (openAddBtn) openAddBtn.addEventListener('click', () => openExpenseModal());
+
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            if (closeModalBtn) closeModalBtn.addEventListener('click', closeExpenseModal);
+
+            const cancelModalBtn = document.getElementById('cancel-modal-btn');
+            if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeExpenseModal);
+
+            const expenseForm = document.getElementById('expense-form');
+            if (expenseForm) expenseForm.addEventListener('submit', handleFormSubmit);
+
+            // Excel Import & Export
+            const exportBtn = document.getElementById('export-excel-btn');
+            if (exportBtn) exportBtn.addEventListener('click', exportToExcel);
+
+            const importBtn = document.getElementById('import-btn');
+            if (importBtn) importBtn.addEventListener('click', openImportModal);
+
+            const closeImportModalBtn = document.getElementById('close-import-modal-btn');
+            if (closeImportModalBtn) closeImportModalBtn.addEventListener('click', closeImportModal);
+
+            const closeImportBtn = document.getElementById('close-import-btn');
+            if (closeImportBtn) closeImportBtn.addEventListener('click', closeImportModal);
+
+            const downloadTemplateBtn = document.getElementById('download-template-btn');
+            if (downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', downloadSampleExcelTemplate);
+
+            // Drag & Drop File Upload
+            const dropZone = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('file-input');
+
+            if (dropZone && fileInput) {
+                dropZone.addEventListener('click', () => fileInput.click());
+
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-active');
+                });
+
+                dropZone.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('drag-active');
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-active');
+                    if (e.dataTransfer.files.length) {
+                        handleExcelImport(e.dataTransfer.files[0]);
+                    }
+                });
+
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length) {
+                        handleExcelImport(e.target.files[0]);
+                    }
+                });
+            }
+
+            // Search and Filter Listeners
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.addEventListener('input', renderTable);
+
+            const filterCat = document.getElementById('filter-category');
+            if (filterCat) filterCat.addEventListener('change', renderTable);
+
+            const filterPay = document.getElementById('filter-payment');
+            if (filterPay) filterPay.addEventListener('change', renderTable);
+
+            const resetFiltersBtn = document.getElementById('reset-filters-btn');
+            if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetFilters);
+
+            const clearDataBtn = document.getElementById('clear-data-btn');
+            if (clearDataBtn) {
+                clearDataBtn.addEventListener('click', () => {
+                    showConfirmModal(
+                        'Clear All Expenses?',
+                        'Are you sure you want to delete all recorded expenses for your account? This action cannot be undone.',
+                        async () => {
+                            await clearUserExpensesFromFirestore();
+                            showToast('All expense data cleared', 'info');
+                        }
+                    );
+                });
+            }
+
+            // Monthly Budget Cap Setting
+            const setBudgetBtn = document.getElementById('set-budget-btn');
+            if (setBudgetBtn) {
+                setBudgetBtn.addEventListener('click', async () => {
+                    const newCap = prompt('Enter your monthly spending budget cap ($):', monthlyBudget);
+                    if (newCap !== null) {
+                        const parsed = parseFloat(newCap);
+                        if (!isNaN(parsed) && parsed > 0) {
+                            monthlyBudget = parsed;
+                            if (currentUser) {
+                                await updateUserBudgetInFirestore(parsed);
+                            }
+                            renderDashboard();
+                            showToast(`Monthly budget set to $${parsed.toFixed(2)}`, 'success');
+                        } else {
+                            showToast('Please enter a valid positive number for budget.', 'error');
+                        }
+                    }
+                });
+            }
+
+            // Confirmation Modal Actions
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', closeConfirmModal);
+
+            const confirmActionBtn = document.getElementById('confirm-action-btn');
+            if (confirmActionBtn) {
+                confirmActionBtn.addEventListener('click', () => {
+                    if (typeof activeConfirmCallback === 'function') {
+                        activeConfirmCallback();
+                    }
+                    closeConfirmModal();
+                });
+            }
+        }
+
         async function setupFirebaseAndAuth() {
             try {
                 let firebaseConfig = null;
@@ -775,7 +857,7 @@
                         await signInAnonymously(auth);
                     }
                     isCloudMode = true;
-
+                    
                     // Update header sync status badge
                     const syncBadge = document.getElementById('sync-status-badge');
                     if (syncBadge) {
@@ -1139,7 +1221,7 @@
 
         function calculateStats() {
             const total = expenses.reduce((sum, item) => sum + item.amount, 0);
-
+            
             // Stat 1: Total Spent
             animateNumber('stat-total-spent', total);
             document.getElementById('stat-record-count').innerText = `${expenses.length} expenses recorded`;
@@ -1172,7 +1254,7 @@
             // Stat 4: Budget Progress
             document.getElementById('stat-budget-spent').innerText = `$${total.toFixed(2)}`;
             document.getElementById('stat-budget-limit').innerText = `of $${monthlyBudget.toLocaleString()} budget`;
-
+            
             const budgetPct = Math.min((total / monthlyBudget) * 100, 100);
             const progressBar = document.getElementById('budget-progress-bar');
             progressBar.style.width = `${budgetPct}%`;
@@ -1197,7 +1279,7 @@
             const el = document.getElementById(elementId);
             const currentVal = parseFloat(el.innerText.replace('$', '').replace(',', '')) || 0;
             const obj = { val: currentVal };
-
+            
             gsap.to(obj, {
                 val: value,
                 duration: 0.8,
@@ -1298,7 +1380,7 @@
             const catFilter = document.getElementById('filter-category').value;
             const payFilter = document.getElementById('filter-payment').value;
             const searchVal = document.getElementById('search-input').value;
-
+            
             if (catFilter !== 'ALL' || payFilter !== 'ALL' || searchVal) {
                 document.getElementById('filtered-badge').innerText = 'Filtered';
                 document.getElementById('filtered-badge').className = 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-100 text-brand-700';
@@ -1335,14 +1417,14 @@
 
             const catLabels = Object.keys(catMap);
             const catData = Object.values(catMap);
-
+            
             const emptyData = catLabels.length === 0;
             const displayLabels = emptyData ? ['No Data Yet'] : catLabels;
             const displayData = emptyData ? [1] : catData;
             const catColors = emptyData ? ['#e2e8f0'] : catLabels.map(label => (categoryColors[label] ? categoryColors[label].chart : '#64748b'));
 
             const catCtx = document.getElementById('categoryChart').getContext('2d');
-
+            
             if (categoryChartInstance) {
                 categoryChartInstance.destroy();
             }
@@ -1375,7 +1457,7 @@
                         tooltip: {
                             enabled: !emptyData,
                             callbacks: {
-                                label: function (context) {
+                                label: function(context) {
                                     const val = context.raw || 0;
                                     return ` $${val.toFixed(2)}`;
                                 }
@@ -1389,7 +1471,7 @@
             // Spending Trend Chart
             const dateMap = {};
             const sortedExpenses = [...expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
-
+            
             sortedExpenses.forEach(e => {
                 dateMap[e.date] = (dateMap[e.date] || 0) + e.amount;
             });
@@ -1424,7 +1506,7 @@
                         tooltip: {
                             enabled: dateData.length > 0,
                             callbacks: {
-                                label: function (context) {
+                                label: function(context) {
                                     return ` Total: $${context.raw.toFixed(2)}`;
                                 }
                             }
@@ -1438,7 +1520,7 @@
                         y: {
                             grid: { color: '#f1f5f9' },
                             beginAtZero: true,
-                            ticks: {
+                            ticks: { 
                                 font: { family: 'Inter', size: 11 },
                                 callback: value => `$${value}`
                             }
@@ -1457,7 +1539,7 @@
             try {
                 const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
                 const uniqueDates = new Set(expenses.map(e => e.date)).size || 1;
-
+                
                 const catSummary = {};
                 expenses.forEach(e => {
                     catSummary[e.category] = (catSummary[e.category] || 0) + e.amount;
@@ -1515,7 +1597,7 @@
         async function handleExcelImport(file) {
             const reader = new FileReader();
 
-            reader.onload = async function (e) {
+            reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
@@ -1744,11 +1826,10 @@
         }
 
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g,
+            return str.replace(/[&<>'"]/g, 
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
             );
         }
     </script>
 </body>
-
 </html>
