@@ -2,7 +2,7 @@
 <html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ExpenSight Pro - Daily Expense Tracker & Excel Generator</title>
     
     <!-- Tailwind CSS -->
@@ -41,15 +41,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <!-- Firebase SDK (ES Module Loader) -->
+    <!-- Firebase SDK Loader -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         window.FirebaseSDK = {
             initializeApp, getAuth, signInAnonymously,
-            getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot
+            getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot
         };
         window.dispatchEvent(new Event('firebase-sdk-ready'));
     </script>
@@ -57,9 +57,9 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
         .glass-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1px solid rgba(226, 232, 240, 0.9);
             box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
         }
         .gradient-text {
@@ -67,55 +67,55 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .modal-overlay { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); }
+        .modal-overlay { background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px); }
         .drag-active { border-color: #0d9488 !important; background-color: #f0fdfa !important; }
     </style>
 </head>
-<body class="min-h-screen pb-12 antialiased">
+<body class="min-h-screen pb-24 md:pb-12 antialiased">
 
     <!-- Header Navigation -->
-    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200/80 mb-8">
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 mb-4 md:mb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
-                        <i class="fa-solid fa-wallet text-xl"></i>
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                        <i class="fa-solid fa-wallet text-base md:text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-800">Expen<span class="gradient-text">Sight</span></h1>
-                        <p class="text-xs font-medium text-slate-400">Daily Tracker & Excel Analytics</p>
+                        <h1 class="text-base md:text-xl font-bold tracking-tight text-slate-800">Expen<span class="gradient-text">Sight</span></h1>
+                        <p class="text-[10px] md:text-xs font-medium text-slate-400">Expense Tracker & Insights</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <div id="sync-status-badge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div id="sync-status-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200 text-[11px] font-semibold text-slate-600">
                         <i id="sync-icon" class="fa-solid fa-hard-drive text-amber-500"></i>
-                        <span id="sync-text">Local Storage</span>
+                        <span id="sync-text">Local</span>
                     </div>
 
-                    <div id="user-profile-badge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
-                        <div class="w-6 h-6 rounded-full bg-brand-500 text-white flex items-center justify-center text-[10px]">
+                    <div id="user-profile-badge" class="hidden flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200 text-[11px] font-semibold text-slate-700">
+                        <div class="w-5 h-5 rounded-full bg-brand-500 text-white flex items-center justify-center text-[9px]">
                             <i class="fa-solid fa-user"></i>
                         </div>
-                        <span id="header-username">Guest</span>
-                        <button id="logout-btn" title="Log Out / Switch User" class="ml-1 text-slate-400 hover:text-rose-500 transition-colors">
+                        <span id="header-username" class="max-w-[70px] sm:max-w-none truncate">User</span>
+                        <button id="logout-btn" title="Log Out" class="ml-1 text-slate-400 hover:text-rose-500">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </button>
                     </div>
 
-                    <button id="import-btn" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-medium text-sm transition-all shadow-sm">
+                    <button id="import-btn" class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-medium text-xs shadow-sm">
                         <i class="fa-solid fa-file-import text-brand-600"></i>
-                        <span>Import Excel</span>
+                        <span>Import</span>
                     </button>
 
-                    <button id="export-excel-btn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-semibold text-sm transition-all shadow-sm">
-                        <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
+                    <button id="export-excel-btn" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-semibold text-xs shadow-sm">
+                        <i class="fa-solid fa-file-excel text-emerald-600"></i>
                         <span>Export Excel</span>
                     </button>
 
-                    <button id="open-add-modal-btn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-sm shadow-md shadow-brand-500/20 transition-all">
+                    <button id="open-add-modal-btn" class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-xs md:text-sm shadow-md shadow-brand-500/20">
                         <i class="fa-solid fa-plus text-xs"></i>
-                        <span class="hidden sm:inline">Add Expense</span>
+                        <span>Add</span>
                     </button>
                 </div>
             </div>
@@ -123,101 +123,114 @@
     </header>
 
     <!-- Main Dashboard -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <!-- Overview Stats -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Spent</span>
-                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-4 md:space-y-8">
+        
+        <!-- Overview Stats Grid -->
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+            <!-- Total Spent -->
+            <div class="stat-card glass-card rounded-2xl p-4 md:p-6 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-1 md:mb-3">
+                    <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400">Total Spent</span>
+                    <div class="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center text-xs md:text-base">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
                 </div>
-                <h2 id="stat-total-spent" class="text-3xl font-extrabold text-slate-800">$0.00</h2>
-                <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                    <i class="fa-regular fa-clock"></i> <span id="stat-record-count">0 expenses recorded</span>
+                <h2 id="stat-total-spent" class="text-lg sm:text-2xl md:text-3xl font-extrabold text-slate-800 truncate">₹0.00</h2>
+                <p class="text-[10px] md:text-xs text-slate-500 mt-1 flex items-center gap-1">
+                    <span id="stat-record-count">0 expenses</span>
                 </p>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
             </div>
 
-            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Daily Average</span>
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+            <!-- Daily Average -->
+            <div class="stat-card glass-card rounded-2xl p-4 md:p-6 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-1 md:mb-3">
+                    <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400">Daily Average</span>
+                    <div class="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-xs md:text-base">
                         <i class="fa-solid fa-chart-line"></i>
                     </div>
                 </div>
-                <h2 id="stat-daily-avg" class="text-3xl font-extrabold text-slate-800">$0.00</h2>
-                <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                    <i class="fa-regular fa-calendar"></i> <span id="stat-active-days">Based on active days</span>
+                <h2 id="stat-daily-avg" class="text-lg sm:text-2xl md:text-3xl font-extrabold text-slate-800 truncate">₹0.00</h2>
+                <p class="text-[10px] md:text-xs text-slate-500 mt-1 truncate">
+                    <span id="stat-active-days">Across 0 days</span>
                 </p>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
             </div>
 
-            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Top Category</span>
-                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
+            <!-- Top Category -->
+            <div class="stat-card glass-card rounded-2xl p-4 md:p-6 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-1 md:mb-3">
+                    <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400">Top Category</span>
+                    <div class="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-xs md:text-base">
                         <i class="fa-solid fa-crown"></i>
                     </div>
                 </div>
-                <h2 id="stat-top-category" class="text-2xl font-bold text-slate-800 truncate">None</h2>
-                <p id="stat-top-cat-amount" class="text-xs text-slate-500 mt-2">$0.00 spent in category</p>
+                <h2 id="stat-top-category" class="text-base sm:text-xl md:text-2xl font-bold text-slate-800 truncate">None</h2>
+                <p id="stat-top-cat-amount" class="text-[10px] md:text-xs text-slate-500 mt-1 truncate">₹0.00 spent</p>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
 
-            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Monthly Budget</span>
-                    <button id="set-budget-btn" class="text-xs text-brand-600 hover:text-brand-700 font-medium underline">Set Cap</button>
+            <!-- Budget -->
+            <div class="stat-card glass-card rounded-2xl p-4 md:p-6 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-1 md:mb-2">
+                    <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400">Monthly Budget</span>
+                    <button id="set-budget-btn" class="text-[10px] md:text-xs text-brand-600 hover:text-brand-700 font-semibold underline">Set Cap</button>
                 </div>
-                <div class="flex items-baseline justify-between mb-2">
-                    <span id="stat-budget-spent" class="text-lg font-bold text-slate-800">$0.00</span>
-                    <span id="stat-budget-limit" class="text-xs text-slate-400">of $2,500</span>
+                <div class="flex items-baseline justify-between mb-1">
+                    <span id="stat-budget-spent" class="text-sm sm:text-base md:text-lg font-bold text-slate-800 truncate">₹0.00</span>
+                    <span id="stat-budget-limit" class="text-[10px] md:text-xs text-slate-400 truncate">of ₹25,000</span>
                 </div>
-                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-1">
                     <div id="budget-progress-bar" class="h-full bg-brand-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
-                <p id="budget-status-text" class="text-xs font-medium text-emerald-600 mt-2 flex items-center gap-1">
+                <p id="budget-status-text" class="text-[10px] md:text-xs font-medium text-emerald-600 truncate">
                     <i class="fa-solid fa-circle-check"></i> Within budget
                 </p>
             </div>
         </section>
 
-        <!-- Visual Analytics -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="glass-card rounded-2xl p-6 flex flex-col">
-                <h3 class="font-bold text-slate-800 text-base mb-1">Category Breakdown</h3>
-                <p class="text-xs text-slate-400 mb-4">Distribution by expense category</p>
-                <div class="relative flex-1 min-h-[220px] flex items-center justify-center">
+        <!-- Charts -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <div class="glass-card rounded-2xl p-4 md:p-6 flex flex-col">
+                <h3 class="font-bold text-slate-800 text-sm md:text-base mb-0.5">Category Breakdown</h3>
+                <p class="text-[11px] md:text-xs text-slate-400 mb-3">Distribution across spending heads</p>
+                <div class="relative flex-1 min-h-[200px] flex items-center justify-center">
                     <canvas id="categoryChart"></canvas>
                 </div>
             </div>
 
-            <div class="glass-card rounded-2xl p-6 lg:col-span-2 flex flex-col">
-                <h3 class="font-bold text-slate-800 text-base mb-1">Spending Analytics</h3>
-                <p class="text-xs text-slate-400 mb-4">Daily expenditure progression</p>
-                <div class="relative flex-1 min-h-[220px] w-full">
+            <div class="glass-card rounded-2xl p-4 md:p-6 lg:col-span-2 flex flex-col">
+                <h3 class="font-bold text-slate-800 text-sm md:text-base mb-0.5">Daily Spending Analytics</h3>
+                <p class="text-[11px] md:text-xs text-slate-400 mb-3">Expenditure trend over time</p>
+                <div class="relative flex-1 min-h-[200px] w-full">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <!-- Expense Table Log -->
+        <!-- Table & Filter Logs -->
         <section class="glass-card rounded-2xl overflow-hidden shadow-sm">
-            <div class="p-5 border-b border-slate-200/80 bg-slate-50/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <h3 class="font-bold text-slate-800 text-lg">Expense Log</h3>
-                    <span id="filtered-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">Showing all</span>
+            <div class="p-3.5 sm:p-5 border-b border-slate-200/80 bg-slate-50/50 flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-slate-800 text-base md:text-lg">Expense Log</h3>
+                        <span id="filtered-badge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-200 text-slate-700">All</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="mobile-export-btn" class="sm:hidden text-xs text-emerald-700 font-semibold px-2 py-1 bg-emerald-50 rounded-lg border border-emerald-200">
+                            <i class="fa-solid fa-file-excel"></i> Excel
+                        </button>
+                        <button id="clear-data-btn" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1">Clear All</button>
+                    </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3">
-                    <div class="relative min-w-[200px] flex-1 sm:flex-none">
+                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+                    <div class="col-span-2 relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="text" id="search-input" placeholder="Search description..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:ring-2 focus:ring-brand-500">
+                        <input type="text" id="search-input" placeholder="Search chai, petrol, groceries..." class="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:ring-2 focus:ring-brand-500">
                     </div>
 
-                    <select id="filter-category" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700">
+                    <select id="filter-category" class="w-full sm:w-auto py-2 px-2.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-700">
                         <option value="ALL">All Categories</option>
                         <option value="Food & Dining">Food & Dining</option>
                         <option value="Transportation">Transportation</option>
@@ -230,79 +243,86 @@
                         <option value="Other">Other</option>
                     </select>
 
-                    <select id="filter-payment" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700">
+                    <select id="filter-payment" class="w-full sm:w-auto py-2 px-2.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-700">
                         <option value="ALL">All Payments</option>
+                        <option value="UPI (GPay / PhonePe / Paytm)">UPI (GPay / PhonePe / Paytm)</option>
                         <option value="Credit Card">Credit Card</option>
                         <option value="Debit Card">Debit Card</option>
-                        <option value="UPI / Bank">UPI / Bank</option>
+                        <option value="Net Banking">Net Banking</option>
                         <option value="Cash">Cash</option>
                     </select>
 
-                    <button id="reset-filters-btn" title="Reset Filters" class="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 text-xs">
-                        <i class="fa-solid fa-rotate-left"></i>
+                    <button id="reset-filters-btn" title="Reset Filters" class="col-span-2 sm:col-span-1 p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 text-xs text-center">
+                        <i class="fa-solid fa-rotate-left"></i> Reset
                     </button>
-                    <button id="clear-data-btn" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1">Clear All</button>
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[700px]">
+            <!-- Responsive List / Table -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[650px]">
                     <thead>
                         <tr class="bg-slate-100/60 text-slate-500 text-xs font-semibold uppercase border-b border-slate-200">
-                            <th class="py-3.5 px-5 cursor-pointer" onclick="sortTable('date')">Date <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
-                            <th class="py-3.5 px-5 cursor-pointer" onclick="sortTable('category')">Category <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
-                            <th class="py-3.5 px-5">Description</th>
-                            <th class="py-3.5 px-5">Method</th>
-                            <th class="py-3.5 px-5 text-right cursor-pointer" onclick="sortTable('amount')">Amount <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
-                            <th class="py-3.5 px-5 text-center">Actions</th>
+                            <th class="py-3 px-4 cursor-pointer" onclick="sortTable('date')">Date <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
+                            <th class="py-3 px-4 cursor-pointer" onclick="sortTable('category')">Category <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
+                            <th class="py-3 px-4">Description</th>
+                            <th class="py-3 px-4">Payment Method</th>
+                            <th class="py-3 px-4 text-right cursor-pointer" onclick="sortTable('amount')">Amount <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
+                            <th class="py-3 px-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="expense-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
                 </table>
             </div>
 
-            <div id="empty-state" class="hidden py-16 text-center">
-                <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3 text-2xl">
-                    <i class="fa-solid fa-folder-open"></i>
+            <!-- Mobile Card Feed -->
+            <div id="expense-mobile-feed" class="md:hidden divide-y divide-slate-100 p-2 space-y-2"></div>
+
+            <div id="empty-state" class="hidden py-12 text-center">
+                <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2 text-xl">
+                    <i class="fa-solid fa-receipt"></i>
                 </div>
-                <h4 class="text-base font-semibold text-slate-700 mb-1">No expenses recorded</h4>
-                <p class="text-xs text-slate-400 mb-4">Add your daily expenses to begin tracking.</p>
-                <button onclick="document.getElementById('open-add-modal-btn').click()" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-medium text-xs shadow hover:bg-brand-700">+ Add Expense</button>
+                <h4 class="text-sm font-semibold text-slate-700">No expenses recorded</h4>
+                <p class="text-xs text-slate-400 mb-3">Add daily spends or check your filters.</p>
+                <button onclick="document.getElementById('open-add-modal-btn').click()" class="px-3.5 py-1.5 rounded-xl bg-brand-600 text-white text-xs font-medium shadow">+ Add Expense</button>
             </div>
 
-            <div class="p-4 bg-slate-50/80 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <div class="p-3 sm:p-4 bg-slate-50/80 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
                 <span id="table-summary-count">Showing 0 entries</span>
                 <div class="font-semibold text-slate-700">
-                    <span>Filtered Total: </span>
-                    <span id="filtered-total-amount" class="text-sm text-brand-700 font-bold">$0.00</span>
+                    <span>Total: </span>
+                    <span id="filtered-total-amount" class="text-sm text-brand-700 font-bold">₹0.00</span>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Expense Modal -->
-    <div id="expense-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="expense-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
-            <button id="close-modal-btn" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center">
+    <div id="expense-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="expense-modal-card" class="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button id="close-modal-btn" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <h3 id="modal-title" class="text-xl font-bold text-slate-800 mb-4">Add New Expense</h3>
+            <h3 id="modal-title" class="text-lg sm:text-xl font-bold text-slate-800 mb-3">Add Daily Expense</h3>
 
-            <form id="expense-form" class="space-y-4">
+            <form id="expense-form" class="space-y-3.5">
                 <input type="hidden" id="expense-id">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Amount ($)</label>
-                    <input type="number" step="0.01" min="0.01" id="form-amount" placeholder="0.00" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-lg font-bold">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Amount (₹)</label>
+                    <div class="relative">
+                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-base">₹</span>
+                        <input type="number" step="1" min="1" id="form-amount" placeholder="500" required class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-slate-200 text-base font-bold text-slate-800 focus:ring-2 focus:ring-brand-500">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Description</label>
-                    <input type="text" id="form-description" placeholder="e.g. Grocery shopping" required class="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm">
+                    <input type="text" id="form-description" placeholder="e.g. Swiggy order / Petrol at IndianOil" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Category</label>
-                        <select id="form-category" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white">
+                        <select id="form-category" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white">
                             <option value="Food & Dining">Food & Dining</option>
                             <option value="Transportation">Transportation</option>
                             <option value="Shopping">Shopping</option>
@@ -315,40 +335,41 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment</label>
-                        <select id="form-payment" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment Method</label>
+                        <select id="form-payment" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white">
+                            <option value="UPI (GPay / PhonePe / Paytm)">UPI (GPay / PhonePe / Paytm)</option>
                             <option value="Credit Card">Credit Card</option>
                             <option value="Debit Card">Debit Card</option>
-                            <option value="UPI / Bank">UPI / Bank</option>
+                            <option value="Net Banking">Net Banking</option>
                             <option value="Cash">Cash</option>
                         </select>
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Date</label>
-                    <input type="date" id="form-date" required class="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm bg-white">
+                    <input type="date" id="form-date" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white">
                 </div>
-                <div class="pt-3 flex justify-end gap-2">
-                    <button type="button" id="cancel-modal-btn" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm">Cancel</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm">Save Expense</button>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" id="cancel-modal-btn" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs sm:text-sm">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs sm:text-sm shadow-md">Save Expense</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Import Modal -->
-    <div id="import-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="import-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
-            <button id="close-import-modal-btn" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            <h3 class="text-xl font-bold text-slate-800 mb-1">Import Excel Sheet</h3>
-            <p class="text-xs text-slate-400 mb-4">Upload a .xlsx, .xls, or .csv file</p>
+    <div id="import-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="import-modal-card" class="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative">
+            <button id="close-import-modal-btn" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-1">Import Excel Sheet</h3>
+            <p class="text-xs text-slate-400 mb-4">Upload a .xlsx or .csv statement</p>
             <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:border-brand-500">
                 <i class="fa-solid fa-cloud-arrow-up text-2xl text-brand-600 mb-2"></i>
-                <p class="text-sm font-semibold text-slate-700">Click to browse or drag file here</p>
+                <p class="text-xs sm:text-sm font-semibold text-slate-700">Click to browse or drop file</p>
                 <input type="file" id="file-input" accept=".xlsx, .xls, .csv" class="hidden">
             </div>
             <div class="mt-4 flex justify-between items-center">
-                <button id="download-template-btn" class="text-xs text-brand-600 underline">Download Template</button>
+                <button id="download-template-btn" class="text-xs text-brand-600 underline">Sample Excel</button>
                 <button id="close-import-btn" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs">Close</button>
             </div>
         </div>
@@ -356,10 +377,10 @@
 
     <!-- Confirmation Modal -->
     <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xs sm:max-w-sm w-full p-5 text-center">
             <i class="fa-solid fa-triangle-exclamation text-rose-500 text-2xl mb-2"></i>
-            <h3 id="confirm-title" class="text-lg font-bold text-slate-800">Are you sure?</h3>
-            <p id="confirm-msg" class="text-xs text-slate-500 mt-1 mb-5">This action cannot be undone.</p>
+            <h3 id="confirm-title" class="text-base sm:text-lg font-bold text-slate-800">Are you sure?</h3>
+            <p id="confirm-msg" class="text-xs text-slate-500 mt-1 mb-4">This action cannot be undone.</p>
             <div class="flex gap-2">
                 <button id="confirm-cancel-btn" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">Cancel</button>
                 <button id="confirm-action-btn" class="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold">Confirm</button>
@@ -368,46 +389,44 @@
     </div>
 
     <!-- Authentication Modal -->
-    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay transition-opacity duration-300">
-        <div id="auth-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
-            <div class="text-center mb-6">
-                <div class="w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-xl shadow-lg shadow-brand-500/20 mx-auto mb-2">
+    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 modal-overlay transition-opacity duration-300">
+        <div id="auth-modal-card" class="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative">
+            <div class="text-center mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-lg shadow-lg shadow-brand-500/20 mx-auto mb-2">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-slate-800">Welcome to Expen<span class="gradient-text">Sight</span></h2>
-                <p class="text-xs text-slate-400 mt-1">Sign in or create an account to persist your expense history</p>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Expen<span class="gradient-text">Sight</span> India</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Track your daily household & personal expenses</p>
             </div>
 
-            <!-- Tab Buttons -->
-            <div class="flex rounded-2xl bg-slate-100 p-1 mb-5">
-                <button type="button" id="auth-tab-login" class="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-brand-700 shadow-sm transition-all">
+            <div class="flex rounded-xl bg-slate-100 p-1 mb-4">
+                <button type="button" id="auth-tab-login" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white text-brand-700 shadow-sm transition-all">
                     Log In
                 </button>
-                <button type="button" id="auth-tab-signup" class="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all">
+                <button type="button" id="auth-tab-signup" class="flex-1 py-2 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all">
                     Create Account
                 </button>
             </div>
 
-            <!-- Error Banner -->
-            <div id="auth-error-box" class="hidden mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
+            <div id="auth-error-box" class="hidden mb-3 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
                 <i class="fa-solid fa-circle-exclamation text-rose-500"></i>
                 <span id="auth-error-msg">Error</span>
             </div>
 
-            <form id="auth-form" class="space-y-4">
+            <form id="auth-form" class="space-y-3.5">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Username</label>
-                    <input type="text" id="auth-username" required placeholder="e.g. shiven" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
+                    <input type="text" id="auth-username" required placeholder="e.g. rohit_kumar / ananya_sharma" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:ring-2 focus:ring-brand-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password</label>
-                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
+                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:ring-2 focus:ring-brand-500">
                 </div>
                 <div id="confirm-password-container" class="hidden">
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Confirm Password</label>
-                    <input type="password" id="auth-confirm-password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
+                    <input type="password" id="auth-confirm-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:ring-2 focus:ring-brand-500">
                 </div>
-                <button type="submit" id="auth-submit-btn" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-500/20 transition-all flex items-center justify-center gap-2">
+                <button type="submit" id="auth-submit-btn" class="w-full py-2.5 sm:py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs sm:text-sm shadow-md shadow-brand-500/20 transition-all flex items-center justify-center gap-2 mt-2">
                     <span id="auth-btn-text">Log In</span>
                     <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
@@ -416,8 +435,8 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-900 text-white shadow-2xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300">
-        <div id="toast-icon" class="text-emerald-400"><i class="fa-solid fa-circle-check"></i></div>
+    <div id="toast" class="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-slate-900 text-white shadow-2xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300">
+        <div id="toast-icon" class="text-emerald-400 text-sm"><i class="fa-solid fa-circle-check"></i></div>
         <span id="toast-msg">Success</span>
     </div>
 
@@ -435,7 +454,7 @@
         let expenses = [];
         let categoryChartInstance = null;
         let trendChartInstance = null;
-        let monthlyBudget = 2500;
+        let monthlyBudget = 25000;
         let currentSort = { field: 'date', direction: 'desc' };
         let activeConfirmCallback = null;
 
@@ -480,8 +499,8 @@
             if (loginTab && signupTab) {
                 loginTab.addEventListener('click', () => {
                     isSignUpMode = false;
-                    loginTab.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm';
-                    signupTab.className = 'flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
+                    loginTab.className = 'flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-white text-brand-700 shadow-sm';
+                    signupTab.className = 'flex-1 py-2 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
                     confirmPassContainer.classList.add('hidden');
                     authBtnText.innerText = 'Log In';
                     authErrorBox.classList.add('hidden');
@@ -489,8 +508,8 @@
 
                 signupTab.addEventListener('click', () => {
                     isSignUpMode = true;
-                    signupTab.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm';
-                    loginTab.className = 'flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
+                    signupTab.className = 'flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-white text-brand-700 shadow-sm';
+                    loginTab.className = 'flex-1 py-2 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
                     confirmPassContainer.classList.remove('hidden');
                     authBtnText.innerText = 'Create Account';
                     authErrorBox.classList.add('hidden');
@@ -506,6 +525,9 @@
             document.getElementById('expense-form').addEventListener('submit', handleFormSubmit);
 
             document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
+            const mobileExportBtn = document.getElementById('mobile-export-btn');
+            if (mobileExportBtn) mobileExportBtn.addEventListener('click', exportToExcel);
+
             document.getElementById('import-btn').addEventListener('click', openImportModal);
             document.getElementById('close-import-modal-btn').addEventListener('click', closeImportModal);
             document.getElementById('close-import-btn').addEventListener('click', closeImportModal);
@@ -541,16 +563,16 @@
             });
 
             document.getElementById('set-budget-btn').addEventListener('click', async () => {
-                const newCap = prompt('Enter your monthly budget cap ($):', monthlyBudget);
+                const newCap = prompt('Enter your monthly budget cap (₹):', monthlyBudget);
                 if (newCap !== null) {
                     const parsed = parseFloat(newCap);
                     if (!isNaN(parsed) && parsed > 0) {
                         monthlyBudget = parsed;
                         if (currentUser) await updateUserBudget(parsed);
                         renderDashboard();
-                        showToast(`Budget updated to $${parsed.toFixed(2)}`, 'success');
+                        showToast(`Monthly budget updated to ₹${parsed.toLocaleString('en-IN')}`, 'success');
                     } else {
-                        showToast('Please enter a valid positive number.', 'error');
+                        showToast('Please enter a valid positive amount.', 'error');
                     }
                 }
             });
@@ -573,8 +595,8 @@
                     isCloudMode = true;
 
                     const syncBadge = document.getElementById('sync-status-badge');
-                    syncBadge.innerHTML = `<i class="fa-solid fa-cloud text-emerald-500"></i><span class="text-emerald-700">Cloud Synced</span>`;
-                    syncBadge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold';
+                    syncBadge.innerHTML = `<i class="fa-solid fa-cloud text-emerald-500"></i><span class="text-emerald-700">Cloud</span>`;
+                    syncBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] font-semibold';
                 }
             } catch (err) {
                 console.warn("Using local storage fallback:", err);
@@ -610,6 +632,10 @@
 
         async function saveAccountRecord(userDoc) {
             const cleanUser = userDoc.username.toLowerCase().trim();
+            const localUsers = JSON.parse(localStorage.getItem('expensight_users') || '{}');
+            localUsers[cleanUser] = userDoc;
+            localStorage.setItem('expensight_users', JSON.stringify(localUsers));
+
             if (isCloudMode && db) {
                 try {
                     const { doc, setDoc } = window.FirebaseSDK;
@@ -619,9 +645,6 @@
                     console.warn("Firestore save failed, saved locally:", e);
                 }
             }
-            const localUsers = JSON.parse(localStorage.getItem('expensight_users') || '{}');
-            localUsers[cleanUser] = userDoc;
-            localStorage.setItem('expensight_users', JSON.stringify(localUsers));
         }
 
         async function updateUserBudget(newBudget) {
@@ -666,16 +689,6 @@
             if (!currentUser) return;
             const fullExpense = { ...expenseData, userKey: currentUser.userKey };
 
-            if (isCloudMode && db) {
-                try {
-                    const { doc, setDoc } = window.FirebaseSDK;
-                    const expRef = doc(db, 'expensight_expenses', expenseData.id);
-                    await setDoc(expRef, fullExpense);
-                } catch (e) {
-                    console.warn("Cloud save failed, saving locally:", e);
-                }
-            }
-
             const key = `expensight_data_${currentUser.userKey}`;
             const localList = JSON.parse(localStorage.getItem(key) || '[]');
             const idx = localList.findIndex(e => e.id === expenseData.id);
@@ -683,11 +696,26 @@
             else localList.push(fullExpense);
             localStorage.setItem(key, JSON.stringify(localList));
 
+            if (isCloudMode && db) {
+                try {
+                    const { doc, setDoc } = window.FirebaseSDK;
+                    const expRef = doc(db, 'expensight_expenses', expenseData.id);
+                    await setDoc(expRef, fullExpense);
+                } catch (e) {
+                    console.warn("Cloud save failed, local storage intact:", e);
+                }
+            }
+
             if (!isCloudMode) loadLocalExpenses();
         }
 
         async function deleteExpense(id) {
             if (!currentUser) return;
+            const key = `expensight_data_${currentUser.userKey}`;
+            let localList = JSON.parse(localStorage.getItem(key) || '[]');
+            localList = localList.filter(e => e.id !== id);
+            localStorage.setItem(key, JSON.stringify(localList));
+
             if (isCloudMode && db) {
                 try {
                     const { doc, deleteDoc } = window.FirebaseSDK;
@@ -698,25 +726,23 @@
                 }
             }
 
-            const key = `expensight_data_${currentUser.userKey}`;
-            let localList = JSON.parse(localStorage.getItem(key) || '[]');
-            localList = localList.filter(e => e.id !== id);
-            localStorage.setItem(key, JSON.stringify(localList));
-
             if (!isCloudMode) loadLocalExpenses();
         }
 
         async function clearUserExpenses() {
             if (!currentUser) return;
-            if (isCloudMode && db) {
-                for (const exp of expenses) {
-                    const { doc, deleteDoc } = window.FirebaseSDK;
-                    const expRef = doc(db, 'expensight_expenses', exp.id);
-                    await deleteDoc(expRef);
-                }
-            }
             const key = `expensight_data_${currentUser.userKey}`;
             localStorage.removeItem(key);
+
+            if (isCloudMode && db) {
+                for (const exp of expenses) {
+                    try {
+                        const { doc, deleteDoc } = window.FirebaseSDK;
+                        const expRef = doc(db, 'expensight_expenses', exp.id);
+                        await deleteDoc(expRef);
+                    } catch (e) {}
+                }
+            }
             expenses = [];
             renderDashboard();
         }
@@ -753,7 +779,7 @@
 
                     const existingUser = await getAccountRecord(usernameInput);
                     if (existingUser) {
-                        errorMsg.innerText = "Username already exists. Please choose another or log in.";
+                        errorMsg.innerText = "Username already exists. Choose another or log in.";
                         errorBox.classList.remove('hidden');
                         return;
                     }
@@ -763,7 +789,7 @@
                         username: usernameInput,
                         password: passwordInput,
                         userKey: userKey,
-                        monthlyBudget: 2500,
+                        monthlyBudget: 25000,
                         createdAt: new Date().toISOString()
                     };
 
@@ -774,7 +800,7 @@
                 } else {
                     const existingUser = await getAccountRecord(usernameInput);
                     if (!existingUser) {
-                        errorMsg.innerText = "User not found. Please create an account.";
+                        errorMsg.innerText = "Account not found. Please create an account first.";
                         errorBox.classList.remove('hidden');
                         return;
                     }
@@ -785,7 +811,7 @@
                         return;
                     }
 
-                    showToast(`Welcome back, ${existingUser.username}!`, 'success');
+                    showToast(`Namaste, ${existingUser.username}!`, 'success');
                     loginUserSuccess(existingUser);
                 }
             } catch (err) {
@@ -797,7 +823,7 @@
 
         function loginUserSuccess(userDoc) {
             currentUser = userDoc;
-            monthlyBudget = userDoc.monthlyBudget || 2500;
+            monthlyBudget = userDoc.monthlyBudget || 25000;
             localStorage.setItem('expensight_active_username', userDoc.username);
 
             document.getElementById('header-username').innerText = userDoc.username;
@@ -808,7 +834,7 @@
         }
 
         function handleLogout() {
-            showConfirmModal('Log Out?', 'Are you sure you want to log out?', () => {
+            showConfirmModal('Log Out?', 'Are you sure you want to switch user / log out?', () => {
                 currentUser = null;
                 expenses = [];
                 localStorage.removeItem('expensight_active_username');
@@ -847,14 +873,14 @@
 
         function calculateStats() {
             const total = expenses.reduce((sum, item) => sum + item.amount, 0);
-            document.getElementById('stat-total-spent').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('stat-record-count').innerText = `${expenses.length} expenses recorded`;
+            document.getElementById('stat-total-spent').innerText = `₹${total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+            document.getElementById('stat-record-count').innerText = `${expenses.length} recorded`;
 
             const uniqueDates = new Set(expenses.map(e => e.date));
             const activeDays = uniqueDates.size || 1;
             const dailyAvg = total / activeDays;
-            document.getElementById('stat-daily-avg').innerText = `$${dailyAvg.toFixed(2)}`;
-            document.getElementById('stat-active-days').innerText = `Across ${activeDays} active day(s)`;
+            document.getElementById('stat-daily-avg').innerText = `₹${dailyAvg.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('stat-active-days').innerText = `Across ${activeDays} day(s)`;
 
             const catMap = {};
             expenses.forEach(e => { catMap[e.category] = (catMap[e.category] || 0) + e.amount; });
@@ -869,10 +895,10 @@
             }
 
             document.getElementById('stat-top-category').innerText = topCat;
-            document.getElementById('stat-top-cat-amount').innerText = `$${topCatAmt.toFixed(2)} spent in category`;
+            document.getElementById('stat-top-cat-amount').innerText = `₹${topCatAmt.toLocaleString('en-IN')} spent`;
 
-            document.getElementById('stat-budget-spent').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('stat-budget-limit').innerText = `of $${monthlyBudget.toLocaleString()}`;
+            document.getElementById('stat-budget-spent').innerText = `₹${total.toLocaleString('en-IN')}`;
+            document.getElementById('stat-budget-limit').innerText = `of ₹${monthlyBudget.toLocaleString('en-IN')}`;
             
             const budgetPct = Math.min((total / monthlyBudget) * 100, 100);
             const progressBar = document.getElementById('budget-progress-bar');
@@ -881,12 +907,12 @@
             const statusText = document.getElementById('budget-status-text');
             if (total > monthlyBudget) {
                 progressBar.className = 'h-full bg-rose-500 rounded-full transition-all duration-500';
-                statusText.className = 'text-xs font-medium text-rose-600 mt-2 flex items-center gap-1';
-                statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Over budget by $${(total - monthlyBudget).toFixed(2)}`;
+                statusText.className = 'text-[10px] md:text-xs font-medium text-rose-600 truncate';
+                statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Over by ₹${(total - monthlyBudget).toLocaleString('en-IN')}`;
             } else {
                 progressBar.className = 'h-full bg-brand-500 rounded-full transition-all duration-500';
-                statusText.className = 'text-xs font-medium text-emerald-600 mt-2 flex items-center gap-1';
-                statusText.innerHTML = `<i class="fa-solid fa-circle-check"></i> Within budget limit`;
+                statusText.className = 'text-[10px] md:text-xs font-medium text-emerald-600 truncate';
+                statusText.innerHTML = `<i class="fa-solid fa-circle-check"></i> Within safe budget`;
             }
         }
 
@@ -917,49 +943,77 @@
 
         function renderTable() {
             const tbody = document.getElementById('expense-tbody');
+            const mobileFeed = document.getElementById('expense-mobile-feed');
             const emptyState = document.getElementById('empty-state');
             const filtered = getFilteredExpenses();
 
             tbody.innerHTML = '';
+            mobileFeed.innerHTML = '';
 
             if (filtered.length === 0) {
                 emptyState.classList.remove('hidden');
             } else {
                 emptyState.classList.add('hidden');
                 filtered.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50/80 transition-colors';
                     const catStyle = categoryColors[item.category] || categoryColors['Other'];
 
+                    // Desktop Row
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50/80 transition-colors';
                     tr.innerHTML = `
-                        <td class="py-3.5 px-5 text-xs text-slate-600 font-medium whitespace-nowrap">${item.date}</td>
-                        <td class="py-3.5 px-5 whitespace-nowrap">
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block border" 
+                        <td class="py-3 px-4 text-xs text-slate-600 whitespace-nowrap">${item.date}</td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold inline-block border" 
                                   style="background-color: ${catStyle.bg}; color: ${catStyle.text}; border-color: ${catStyle.border}">
                                 ${item.category}
                             </span>
                         </td>
-                        <td class="py-3.5 px-5 font-medium text-slate-800 text-sm">${escapeHTML(item.description)}</td>
-                        <td class="py-3.5 px-5 text-xs text-slate-500 whitespace-nowrap">${item.payment}</td>
-                        <td class="py-3.5 px-5 text-right font-bold text-slate-800 whitespace-nowrap">$${item.amount.toFixed(2)}</td>
-                        <td class="py-3.5 px-5 text-center whitespace-nowrap">
-                            <div class="flex items-center justify-center gap-2">
-                                <button onclick="editExpense('${item.id}')" title="Edit" class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-brand-600 flex items-center justify-center">
-                                    <i class="fa-solid fa-pen text-xs"></i>
+                        <td class="py-3 px-4 font-medium text-slate-800 text-xs sm:text-sm">${escapeHTML(item.description)}</td>
+                        <td class="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">${item.payment}</td>
+                        <td class="py-3 px-4 text-right font-bold text-slate-800 whitespace-nowrap">₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td class="py-3 px-4 text-center whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="editExpense('${item.id}')" title="Edit" class="w-7 h-7 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-brand-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-pen text-[10px]"></i>
                                 </button>
-                                <button onclick="confirmDeleteExpense('${item.id}')" title="Delete" class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-rose-600 flex items-center justify-center">
-                                    <i class="fa-solid fa-trash text-xs"></i>
+                                <button onclick="confirmDeleteExpense('${item.id}')" title="Delete" class="w-7 h-7 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-rose-600 flex items-center justify-center">
+                                    <i class="fa-solid fa-trash text-[10px]"></i>
                                 </button>
                             </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
+
+                    // Mobile Card
+                    const card = document.createElement('div');
+                    card.className = 'p-3 bg-white rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between gap-3';
+                    card.innerHTML = `
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+                                      style="background-color: ${catStyle.bg}; color: ${catStyle.text}; border-color: ${catStyle.border}">
+                                    ${item.category}
+                                </span>
+                                <span class="text-[10px] text-slate-400">${item.date}</span>
+                            </div>
+                            <p class="font-semibold text-slate-800 text-xs truncate">${escapeHTML(item.description)}</p>
+                            <p class="text-[10px] text-slate-400 truncate"><i class="fa-solid fa-receipt text-[9px] mr-1"></i>${item.payment}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-slate-900 text-sm">₹${item.amount.toLocaleString('en-IN')}</div>
+                            <div class="flex items-center justify-end gap-2 mt-1">
+                                <button onclick="editExpense('${item.id}')" class="text-slate-400 hover:text-brand-600 text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="confirmDeleteExpense('${item.id}')" class="text-slate-400 hover:text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    mobileFeed.appendChild(card);
                 });
             }
 
             const filteredTotal = filtered.reduce((sum, item) => sum + item.amount, 0);
-            document.getElementById('table-summary-count').innerText = `Showing ${filtered.length} of ${expenses.length} entries`;
-            document.getElementById('filtered-total-amount').innerText = `$${filteredTotal.toFixed(2)}`;
+            document.getElementById('table-summary-count').innerText = `${filtered.length} of ${expenses.length} entries`;
+            document.getElementById('filtered-total-amount').innerText = `₹${filteredTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
         }
 
         function sortTable(field) {
@@ -1000,14 +1054,24 @@
                         backgroundColor: emptyData ? ['#e2e8f0'] : catLabels.map(l => categoryColors[l]?.chart || '#64748b')
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    cutout: '68%',
+                    plugins: {
+                        legend: {
+                            position: window.innerWidth < 640 ? 'bottom' : 'right',
+                            labels: { boxWidth: 10, font: { size: 10 } }
+                        }
+                    }
+                }
             });
 
             const dateMap = {};
             const sorted = [...expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
             sorted.forEach(e => { dateMap[e.date] = (dateMap[e.date] || 0) + e.amount; });
 
-            const dateLabels = Object.keys(dateMap).slice(-10);
+            const dateLabels = Object.keys(dateMap).slice(-7);
             const dateData = dateLabels.map(d => dateMap[d]);
 
             const trendCtx = document.getElementById('trendChart').getContext('2d');
@@ -1020,14 +1084,19 @@
                     datasets: [{
                         data: dateData.length > 0 ? dateData : [0],
                         backgroundColor: '#14b8a6',
-                        borderRadius: 8
+                        borderRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { callback: v => `₹${v}` }
+                        } 
+                    }
                 }
             });
         }
@@ -1040,11 +1109,11 @@
 
             const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
             const summaryRows = [
-                [`ExpenSight Pro - Financial Summary (${currentUser ? currentUser.username : 'User'})`],
+                [`ExpenSight Pro India - Financial Summary (${currentUser ? currentUser.username : 'User'})`],
                 ["Exported Date", new Date().toLocaleString()],
                 ["Total Expenses Recorded", expenses.length],
-                ["Total Amount Spent", `$${totalSpent.toFixed(2)}`],
-                ["Monthly Budget Cap", `$${monthlyBudget.toFixed(2)}`]
+                ["Total Amount Spent", `₹${totalSpent.toFixed(2)}`],
+                ["Monthly Budget Cap", `₹${monthlyBudget.toFixed(2)}`]
             ];
 
             const summarySheet = XLSX.utils.aoa_to_sheet(summaryRows);
@@ -1054,7 +1123,7 @@
                 "Category": item.category,
                 "Description": item.description,
                 "Payment Method": item.payment,
-                "Amount ($)": item.amount
+                "Amount (INR)": item.amount
             }));
 
             const detailedSheet = XLSX.utils.json_to_sheet(detailedRows);
@@ -1063,8 +1132,8 @@
             XLSX.utils.book_append_sheet(wb, detailedSheet, "Expenses");
 
             XLSX.writeFile(wb, `Expenses_${currentUser ? currentUser.username : 'Report'}_${new Date().toISOString().split('T')[0]}.xlsx`);
-            confetti({ particleCount: 50, spread: 60 });
-            showToast('Excel report generated!', 'success');
+            confetti({ particleCount: 40, spread: 50 });
+            showToast('Excel report downloaded!', 'success');
         }
 
         async function handleExcelImport(file) {
@@ -1078,14 +1147,14 @@
 
                     let count = 0;
                     for (const row of jsonData) {
-                        const amount = parseFloat((row['Amount ($)'] || row['Amount'] || 0).toString().replace('$', '')) || 0;
+                        const amount = parseFloat((row['Amount (INR)'] || row['Amount'] || row['amount'] || 0).toString().replace('₹', '').replace(',', '')) || 0;
                         if (amount > 0) {
                             await saveExpense({
                                 id: Date.now().toString() + Math.random().toString(36).substring(2, 5),
                                 date: row['Date'] || new Date().toISOString().split('T')[0],
                                 category: row['Category'] || 'Other',
                                 description: row['Description'] || 'Imported Expense',
-                                payment: row['Payment Method'] || 'Credit Card',
+                                payment: row['Payment Method'] || 'UPI (GPay / PhonePe / Paytm)',
                                 amount: amount
                             });
                             count++;
@@ -1102,12 +1171,14 @@
 
         function downloadSampleExcelTemplate() {
             const sampleData = [
-                { Date: "2026-08-10", Category: "Food & Dining", Description: "Team Lunch", "Payment Method": "Credit Card", "Amount ($)": 45.50 }
+                { Date: "2026-08-10", Category: "Food & Dining", Description: "Dinner with friends at Bawarchi", "Payment Method": "UPI (GPay / PhonePe / Paytm)", "Amount (INR)": 1450 },
+                { Date: "2026-08-11", Category: "Transportation", Description: "Metro Card Recharge", "Payment Method": "UPI (GPay / PhonePe / Paytm)", "Amount (INR)": 500 },
+                { Date: "2026-08-12", Category: "Shopping", Description: "Groceries from DMart / Blinkit", "Payment Method": "Debit Card", "Amount (INR)": 2340 }
             ];
             const ws = XLSX.utils.json_to_sheet(sampleData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Sample");
-            XLSX.writeFile(wb, "Sample_Expense_Template.xlsx");
+            XLSX.writeFile(wb, "ExpenSight_Indian_Expense_Template.xlsx");
         }
 
         function openExpenseModal(expenseToEdit = null) {
@@ -1121,7 +1192,7 @@
                 document.getElementById('form-payment').value = expenseToEdit.payment;
                 document.getElementById('form-date').value = expenseToEdit.date;
             } else {
-                document.getElementById('modal-title').innerText = 'Add New Expense';
+                document.getElementById('modal-title').innerText = 'Add Daily Expense';
                 document.getElementById('expense-form').reset();
                 document.getElementById('expense-id').value = '';
                 initializeDateInput();
@@ -1146,7 +1217,7 @@
             const date = document.getElementById('form-date').value;
 
             await saveExpense({ id, amount, description, category, payment, date });
-            showToast('Expense saved!', 'success');
+            showToast('Expense logged successfully!', 'success');
             closeExpenseModal();
         }
 
@@ -1156,9 +1227,9 @@
         }
 
         function confirmDeleteExpense(id) {
-            showConfirmModal('Delete Expense?', 'Are you sure you want to remove this record?', async () => {
+            showConfirmModal('Delete Expense?', 'Remove this transaction entry?', async () => {
                 await deleteExpense(id);
-                showToast('Expense deleted', 'info');
+                showToast('Expense removed', 'info');
             });
         }
 
