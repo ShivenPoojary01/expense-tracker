@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="light">
-<head>    <meta charset="UTF-8">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExpenSight Pro - Daily Expense Tracker & Excel Generator</title>
     
@@ -18,12 +19,6 @@
                             500: '#14b8a6',
                             600: '#0d9488',
                             700: '#0f766e',
-                        },
-                        accent: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
                         }
                     },
                     fontFamily: {
@@ -34,97 +29,57 @@
         }
     </script>
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- GSAP for Animations -->
+    <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    
-    <!-- SheetJS for Excel Import/Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <!-- Chart.js for Data Visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+    <!-- Firebase SDK (ES Module Loader) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Expose Firebase functions to global scope for application logic
         window.FirebaseSDK = {
-            initializeApp, getAuth, signInAnonymously, signInWithCustomToken,
+            initializeApp, getAuth, signInAnonymously,
             getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot
         };
+        window.dispatchEvent(new Event('firebase-sdk-ready'));
     </script>
 
-    <!-- Custom CSS Styles -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
-
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
         .glass-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
         }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
         .gradient-text {
             background: linear-gradient(135deg, #0d9488 0%, #4f46e5 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .modal-overlay {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(4px);
-        }
-
-        .drag-active {
-            border-color: #0d9488 !important;
-            background-color: #f0fdfa !important;
-        }
+        .modal-overlay { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); }
+        .drag-active { border-color: #0d9488 !important; background-color: #f0fdfa !important; }
     </style>
 </head>
-<body class="min-h-screen pb-12 antialiased selection:bg-brand-500 selection:text-white">
+<body class="min-h-screen pb-12 antialiased">
 
     <!-- Header Navigation -->
     <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200/80 mb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                
-                <!-- Brand Logo -->
-                <div class="flex items-center gap-3 cursor-pointer logo-btn">
+                <div class="flex items-center gap-3">
                     <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
-                        <i class="fa-solid me-0 fa-wallet text-xl"></i>
+                        <i class="fa-solid fa-wallet text-xl"></i>
                     </div>
                     <div>
                         <h1 class="text-xl font-bold tracking-tight text-slate-800">Expen<span class="gradient-text">Sight</span></h1>
@@ -132,10 +87,8 @@
                     </div>
                 </div>
 
-                <!-- Top Quick Actions -->
                 <div class="flex items-center gap-3">
-                    <!-- Cloud Sync Indicator Badge -->
-                    <div id="sync-status-badge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600" title="Data Storage Status">
+                    <div id="sync-status-badge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600">
                         <i id="sync-icon" class="fa-solid fa-hard-drive text-amber-500"></i>
                         <span id="sync-text">Local Storage</span>
                     </div>
@@ -150,17 +103,17 @@
                         </button>
                     </div>
 
-                    <button id="import-btn" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-medium text-sm transition-all shadow-sm">
+                    <button id="import-btn" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-medium text-sm transition-all shadow-sm">
                         <i class="fa-solid fa-file-import text-brand-600"></i>
                         <span>Import Excel</span>
                     </button>
 
-                    <button id="export-excel-btn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-semibold text-sm transition-all shadow-sm active:scale-95">
+                    <button id="export-excel-btn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-semibold text-sm transition-all shadow-sm">
                         <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
-                        <span>Export Excel Sheet</span>
+                        <span>Export Excel</span>
                     </button>
 
-                    <button id="open-add-modal-btn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-sm shadow-md shadow-brand-500/20 transition-all active:scale-95">
+                    <button id="open-add-modal-btn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-sm shadow-md shadow-brand-500/20 transition-all">
                         <i class="fa-solid fa-plus text-xs"></i>
                         <span class="hidden sm:inline">Add Expense</span>
                     </button>
@@ -169,152 +122,102 @@
         </div>
     </header>
 
-    <!-- Main Content Container -->
+    <!-- Main Dashboard -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-
-        <!-- Top Overview Stats Cards -->
+        <!-- Overview Stats -->
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            
-            <!-- Total Spent Card -->
-            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Spent</span>
                     <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
                 </div>
-                <div class="flex items-baseline gap-2">
-                    <h2 id="stat-total-spent" class="text-3xl font-extrabold text-slate-800">$0.00</h2>
-                </div>
-                <p id="stat-count-sub" class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                <h2 id="stat-total-spent" class="text-3xl font-extrabold text-slate-800">$0.00</h2>
+                <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <i class="fa-regular fa-clock"></i> <span id="stat-record-count">0 expenses recorded</span>
                 </p>
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 to-rose-500"></div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
             </div>
 
-            <!-- Daily Average Card -->
-            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Daily Average</span>
                     <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
                         <i class="fa-solid fa-chart-line"></i>
                     </div>
                 </div>
-                <div class="flex items-baseline gap-2">
-                    <h2 id="stat-daily-avg" class="text-3xl font-extrabold text-slate-800">$0.00</h2>
-                </div>
+                <h2 id="stat-daily-avg" class="text-3xl font-extrabold text-slate-800">$0.00</h2>
                 <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <i class="fa-regular fa-calendar"></i> <span id="stat-active-days">Based on active days</span>
                 </p>
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
             </div>
 
-            <!-- Top Category Card -->
-            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Top Category</span>
                     <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
                         <i class="fa-solid fa-crown"></i>
                     </div>
                 </div>
-                <div class="flex items-baseline gap-2">
-                    <h2 id="stat-top-category" class="text-2xl font-bold text-slate-800 truncate">None</h2>
-                </div>
-                <p id="stat-top-cat-amount" class="text-xs text-slate-500 mt-2">
-                    $0.00 spent in category
-                </p>
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-amber-500"></div>
+                <h2 id="stat-top-category" class="text-2xl font-bold text-slate-800 truncate">None</h2>
+                <p id="stat-top-cat-amount" class="text-xs text-slate-500 mt-2">$0.00 spent in category</p>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
 
-            <!-- Budget Progress Card -->
-            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div class="stat-card glass-card rounded-2xl p-6 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Monthly Budget</span>
-                    <button id="set-budget-btn" class="text-xs text-brand-600 hover:text-brand-700 font-medium underline">
-                        Set Cap
-                    </button>
+                    <button id="set-budget-btn" class="text-xs text-brand-600 hover:text-brand-700 font-medium underline">Set Cap</button>
                 </div>
                 <div class="flex items-baseline justify-between mb-2">
-                    <span id="stat-budget-spent" class="text-lg font-bold text-slate-800">$0</span>
-                    <span id="stat-budget-limit" class="text-xs text-slate-400">of $2,500 budget</span>
+                    <span id="stat-budget-spent" class="text-lg font-bold text-slate-800">$0.00</span>
+                    <span id="stat-budget-limit" class="text-xs text-slate-400">of $2,500</span>
                 </div>
-                
-                <!-- Budget Progress Bar -->
                 <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                     <div id="budget-progress-bar" class="h-full bg-brand-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
                 <p id="budget-status-text" class="text-xs font-medium text-emerald-600 mt-2 flex items-center gap-1">
-                    <i class="fa-solid fa-circle-check"></i> Within safe spending limit
+                    <i class="fa-solid fa-circle-check"></i> Within budget
                 </p>
             </div>
-
         </section>
 
-        <!-- Charts Section -->
+        <!-- Visual Analytics -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Category Breakdown Doughnut -->
             <div class="glass-card rounded-2xl p-6 flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-base">Category Breakdown</h3>
-                        <p class="text-xs text-slate-400">Expense distribution by category</p>
-                    </div>
-                    <div class="p-2 rounded-lg bg-slate-100 text-slate-500 text-xs font-medium">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                </div>
+                <h3 class="font-bold text-slate-800 text-base mb-1">Category Breakdown</h3>
+                <p class="text-xs text-slate-400 mb-4">Distribution by expense category</p>
                 <div class="relative flex-1 min-h-[220px] flex items-center justify-center">
                     <canvas id="categoryChart"></canvas>
                 </div>
             </div>
 
-            <!-- Monthly / Daily Spending Trend Bar Chart -->
             <div class="glass-card rounded-2xl p-6 lg:col-span-2 flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-base">Spending Analytics & Trends</h3>
-                        <p class="text-xs text-slate-400">Daily expenses progression over time</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200">
-                            <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span> Live Sync
-                        </span>
-                    </div>
-                </div>
+                <h3 class="font-bold text-slate-800 text-base mb-1">Spending Analytics</h3>
+                <p class="text-xs text-slate-400 mb-4">Daily expenditure progression</p>
                 <div class="relative flex-1 min-h-[220px] w-full">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
-
         </section>
 
-        <!-- Main Expense Table & Filtering Section -->
+        <!-- Expense Table Log -->
         <section class="glass-card rounded-2xl overflow-hidden shadow-sm">
-            
-            <!-- Filter & Action Bar Header -->
             <div class="p-5 border-b border-slate-200/80 bg-slate-50/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                
-                <!-- Left Title & Counter -->
                 <div class="flex items-center gap-3">
                     <h3 class="font-bold text-slate-800 text-lg">Expense Log</h3>
-                    <span id="filtered-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">
-                        Showing all
-                    </span>
+                    <span id="filtered-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">Showing all</span>
                 </div>
 
-                <!-- Controls & Filters Group -->
                 <div class="flex flex-wrap items-center gap-3">
-                    
-                    <!-- Search Input -->
                     <div class="relative min-w-[200px] flex-1 sm:flex-none">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="text" id="search-input" placeholder="Search description..." 
-                               class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                        <input type="text" id="search-input" placeholder="Search description..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:ring-2 focus:ring-brand-500">
                     </div>
 
-                    <!-- Category Filter -->
-                    <select id="filter-category" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <select id="filter-category" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700">
                         <option value="ALL">All Categories</option>
                         <option value="Food & Dining">Food & Dining</option>
                         <option value="Transportation">Transportation</option>
@@ -327,8 +230,7 @@
                         <option value="Other">Other</option>
                     </select>
 
-                    <!-- Payment Method Filter -->
-                    <select id="filter-payment" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <select id="filter-payment" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700">
                         <option value="ALL">All Payments</option>
                         <option value="Credit Card">Credit Card</option>
                         <option value="Debit Card">Debit Card</option>
@@ -336,113 +238,71 @@
                         <option value="Cash">Cash</option>
                     </select>
 
-                    <!-- Reset Filters Button -->
-                    <button id="reset-filters-btn" title="Reset Filters" class="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-100 text-xs transition-all">
+                    <button id="reset-filters-btn" title="Reset Filters" class="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 text-xs">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
-
-                    <div class="h-5 w-px bg-slate-300 hidden sm:block"></div>
-
-                    <!-- Clear All Data Button -->
-                    <button id="clear-data-btn" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 transition-colors">
-                        Clear All
-                    </button>
+                    <button id="clear-data-btn" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1">Clear All</button>
                 </div>
             </div>
 
-            <!-- Table Area -->
-            <div class="overflow-x-auto custom-scrollbar">
+            <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse min-w-[700px]">
                     <thead>
-                        <tr class="bg-slate-100/60 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
-                            <th class="py-3.5 px-5 cursor-pointer hover:text-slate-800" onclick="sortTable('date')">
-                                Date <i class="fa-solid fa-sort text-[10px] ml-1"></i>
-                            </th>
-                            <th class="py-3.5 px-5 cursor-pointer hover:text-slate-800" onclick="sortTable('category')">
-                                Category <i class="fa-solid fa-sort text-[10px] ml-1"></i>
-                            </th>
+                        <tr class="bg-slate-100/60 text-slate-500 text-xs font-semibold uppercase border-b border-slate-200">
+                            <th class="py-3.5 px-5 cursor-pointer" onclick="sortTable('date')">Date <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
+                            <th class="py-3.5 px-5 cursor-pointer" onclick="sortTable('category')">Category <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
                             <th class="py-3.5 px-5">Description</th>
                             <th class="py-3.5 px-5">Method</th>
-                            <th class="py-3.5 px-5 text-right cursor-pointer hover:text-slate-800" onclick="sortTable('amount')">
-                                Amount <i class="fa-solid fa-sort text-[10px] ml-1"></i>
-                            </th>
+                            <th class="py-3.5 px-5 text-right cursor-pointer" onclick="sortTable('amount')">Amount <i class="fa-solid fa-sort text-[10px] ml-1"></i></th>
                             <th class="py-3.5 px-5 text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="expense-tbody" class="divide-y divide-slate-100 text-sm">
-                        <!-- Expense Rows Injected Dynamically -->
-                    </tbody>
+                    <tbody id="expense-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
                 </table>
             </div>
 
-            <!-- Empty State Display -->
             <div id="empty-state" class="hidden py-16 text-center">
-                <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+                <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3 text-2xl">
                     <i class="fa-solid fa-folder-open"></i>
                 </div>
-                <h4 class="text-base font-semibold text-slate-700 mb-1">No expenses found</h4>
-                <p class="text-xs text-slate-400 max-w-sm mx-auto mb-5">Start tracking your daily expenses or adjust your current filter choices.</p>
-                <button onclick="document.getElementById('open-add-modal-btn').click()" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-medium text-xs shadow hover:bg-brand-700 transition-all">
-                    + Add New Expense
-                </button>
+                <h4 class="text-base font-semibold text-slate-700 mb-1">No expenses recorded</h4>
+                <p class="text-xs text-slate-400 mb-4">Add your daily expenses to begin tracking.</p>
+                <button onclick="document.getElementById('open-add-modal-btn').click()" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-medium text-xs shadow hover:bg-brand-700">+ Add Expense</button>
             </div>
 
-            <!-- Table Footer Stats -->
             <div class="p-4 bg-slate-50/80 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-                <span id="table-summary-count">Showing 0 of 0 entries</span>
-                <div class="font-semibold text-slate-700 flex items-center gap-2">
-                    <span>Filtered Total:</span>
+                <span id="table-summary-count">Showing 0 entries</span>
+                <div class="font-semibold text-slate-700">
+                    <span>Filtered Total: </span>
                     <span id="filtered-total-amount" class="text-sm text-brand-700 font-bold">$0.00</span>
                 </div>
             </div>
-
         </section>
-
     </main>
 
-    <!-- Footer -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-slate-400">
-        <p>ExpenSight &copy; 2026. Interactive Light-UI Daily Expense Tracker with Native SheetJS Excel Export.</p>
-    </footer>
-
-    <!-- ADD / EDIT EXPENSE MODAL -->
+    <!-- Expense Modal -->
     <div id="expense-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="expense-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl transform scale-90 transition-transform duration-300 relative">
-            
-            <button id="close-modal-btn" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors">
+        <div id="expense-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+            <button id="close-modal-btn" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <div class="mb-6">
-                <h3 id="modal-title" class="text-xl font-bold text-slate-800">Add New Expense</h3>
-                <p class="text-xs text-slate-400 mt-1">Enter daily transaction details below</p>
-            </div>
+            <h3 id="modal-title" class="text-xl font-bold text-slate-800 mb-4">Add New Expense</h3>
 
             <form id="expense-form" class="space-y-4">
                 <input type="hidden" id="expense-id">
-
-                <!-- Amount Field -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Amount ($)</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-lg">$</span>
-                        <input type="number" step="0.01" min="0.01" id="form-amount" placeholder="0.00" required
-                               class="w-full pl-9 pr-4 py-3 text-lg font-bold rounded-2xl border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
-                    </div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Amount ($)</label>
+                    <input type="number" step="0.01" min="0.01" id="form-amount" placeholder="0.00" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-lg font-bold">
                 </div>
-
-                <!-- Description -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Description</label>
-                    <input type="text" id="form-description" placeholder="e.g. Grocery shopping at Target" required
-                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Description</label>
+                    <input type="text" id="form-description" placeholder="e.g. Grocery shopping" required class="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm">
                 </div>
-
-                <!-- Category & Payment Method Row -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Category</label>
-                        <select id="form-category" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Category</label>
+                        <select id="form-category" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white">
                             <option value="Food & Dining">Food & Dining</option>
                             <option value="Transportation">Transportation</option>
                             <option value="Shopping">Shopping</option>
@@ -454,10 +314,9 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
-
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Payment Method</label>
-                        <select id="form-payment" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment</label>
+                        <select id="form-payment" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white">
                             <option value="Credit Card">Credit Card</option>
                             <option value="Debit Card">Debit Card</option>
                             <option value="UPI / Bank">UPI / Bank</option>
@@ -465,143 +324,90 @@
                         </select>
                     </div>
                 </div>
-
-                <!-- Date Picker -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Date</label>
-                    <input type="date" id="form-date" required
-                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Date</label>
+                    <input type="date" id="form-date" required class="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm bg-white">
                 </div>
-
-                <!-- Modal Action Buttons -->
-                <div class="pt-4 flex items-center justify-end gap-3">
-                    <button type="button" id="cancel-modal-btn" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium text-sm transition-all">
-                        Cancel
-                    </button>
-                    <button type="submit" id="save-expense-btn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white font-medium text-sm shadow-lg shadow-brand-500/20 transition-all">
-                        Save Expense
-                    </button>
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" id="cancel-modal-btn" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm">Save Expense</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- IMPORT EXCEL MODAL -->
+    <!-- Import Modal -->
     <div id="import-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="import-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl transform scale-90 transition-transform duration-300 relative">
-            
-            <button id="close-import-modal-btn" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="mb-5">
-                <h3 class="text-xl font-bold text-slate-800">Import Expenses from Excel</h3>
-                <p class="text-xs text-slate-400 mt-1">Upload a `.xlsx`, `.xls` or `.csv` spreadsheet file</p>
-            </div>
-
-            <!-- Drag & Drop Area -->
-            <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center cursor-pointer hover:border-brand-500 transition-all bg-slate-50/50">
-                <div class="w-12 h-12 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mx-auto mb-3 text-xl">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                </div>
-                <p class="text-sm font-semibold text-slate-700 mb-1">Click to browse or drag & drop</p>
-                <p class="text-xs text-slate-400">Supports SheetJS XLSX, XLS, CSV formats</p>
+        <div id="import-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+            <button id="close-import-modal-btn" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-xl font-bold text-slate-800 mb-1">Import Excel Sheet</h3>
+            <p class="text-xs text-slate-400 mb-4">Upload a .xlsx, .xls, or .csv file</p>
+            <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:border-brand-500">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl text-brand-600 mb-2"></i>
+                <p class="text-sm font-semibold text-slate-700">Click to browse or drag file here</p>
                 <input type="file" id="file-input" accept=".xlsx, .xls, .csv" class="hidden">
             </div>
-
-            <div class="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-                <p class="font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> Excel Column Guidelines:</p>
-                <p class="mt-1 text-amber-700">Ensure columns include headers like: <strong>Date, Category, Description, Amount, Method</strong>.</p>
-            </div>
-
-            <div class="mt-6 flex justify-between items-center">
-                <button id="download-template-btn" class="text-xs text-brand-600 hover:text-brand-700 font-semibold underline flex items-center gap-1">
-                    <i class="fa-solid fa-download"></i> Download Sample Excel
-                </button>
-                <button id="close-import-btn" class="px-5 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-medium">
-                    Close
-                </button>
+            <div class="mt-4 flex justify-between items-center">
+                <button id="download-template-btn" class="text-xs text-brand-600 underline">Download Template</button>
+                <button id="close-import-btn" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- CUSTOM CONFIRMATION MODAL -->
+    <!-- Confirmation Modal -->
     <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center relative">
-            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4 text-xl">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center">
+            <i class="fa-solid fa-triangle-exclamation text-rose-500 text-2xl mb-2"></i>
             <h3 id="confirm-title" class="text-lg font-bold text-slate-800">Are you sure?</h3>
-            <p id="confirm-msg" class="text-xs text-slate-500 mt-2 mb-6">This action cannot be undone.</p>
-            <div class="flex items-center gap-3">
-                <button id="confirm-cancel-btn" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold">
-                    Cancel
-                </button>
-                <button id="confirm-action-btn" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-md shadow-rose-500/20">
-                    Confirm
-                </button>
+            <p id="confirm-msg" class="text-xs text-slate-500 mt-1 mb-5">This action cannot be undone.</p>
+            <div class="flex gap-2">
+                <button id="confirm-cancel-btn" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">Cancel</button>
+                <button id="confirm-action-btn" class="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold">Confirm</button>
             </div>
         </div>
     </div>
 
-    <!-- USER LOGIN / SIGN UP MODAL -->
+    <!-- Authentication Modal -->
     <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay transition-opacity duration-300">
         <div id="auth-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
-            
             <div class="text-center mb-6">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-brand-500/20 mx-auto mb-3">
+                <div class="w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-xl shadow-lg shadow-brand-500/20 mx-auto mb-2">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h2 class="text-2xl font-extrabold text-slate-800">Welcome to Expen<span class="gradient-text">Sight</span></h2>
-                <p class="text-xs text-slate-400 mt-1">Sign in to access your personal expenses or create a new account</p>
+                <h2 class="text-2xl font-bold text-slate-800">Welcome to Expen<span class="gradient-text">Sight</span></h2>
+                <p class="text-xs text-slate-400 mt-1">Sign in or create an account to persist your expense history</p>
             </div>
 
             <!-- Tab Buttons -->
-            <div class="flex rounded-2xl bg-slate-100 p-1 mb-6">
-                <button id="auth-tab-login" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm">
+            <div class="flex rounded-2xl bg-slate-100 p-1 mb-5">
+                <button type="button" id="auth-tab-login" class="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-brand-700 shadow-sm transition-all">
                     Log In
                 </button>
-                <button id="auth-tab-signup" class="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all">
+                <button type="button" id="auth-tab-signup" class="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all">
                     Create Account
                 </button>
             </div>
 
-            <!-- Auth Error Alert Box -->
+            <!-- Error Banner -->
             <div id="auth-error-box" class="hidden mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
-                <i class="fa-solid fa-circle-exclamation text-rose-500 text-sm"></i>
-                <span id="auth-error-msg">Invalid credentials</span>
+                <i class="fa-solid fa-circle-exclamation text-rose-500"></i>
+                <span id="auth-error-msg">Error</span>
             </div>
 
             <form id="auth-form" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Username</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="text" id="auth-username" required placeholder="e.g. alex_smith"
-                               class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Username</label>
+                    <input type="text" id="auth-username" required placeholder="e.g. shiven" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
                 </div>
-
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Password</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="password" id="auth-password" required placeholder="••••••••"
-                               class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
                 </div>
-
-                <!-- Confirm Password Field (Only for Sign Up) -->
                 <div id="confirm-password-container" class="hidden">
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Confirm Password</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-shield-halved absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="password" id="auth-confirm-password" placeholder="••••••••"
-                               class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Confirm Password</label>
+                    <input type="password" id="auth-confirm-password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
                 </div>
-
-                <button type="submit" id="auth-submit-btn" class="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-lg shadow-brand-500/20 transition-all active:scale-95 mt-2 flex items-center justify-center gap-2">
+                <button type="submit" id="auth-submit-btn" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-500/20 transition-all flex items-center justify-center gap-2">
                     <span id="auth-btn-text">Log In</span>
                     <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
@@ -609,31 +415,23 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-slate-900 text-white shadow-2xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300">
-        <div id="toast-icon" class="text-emerald-400 text-base">
-            <i class="fa-solid fa-circle-check"></i>
-        </div>
-        <span id="toast-msg">Action performed successfully</span>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-900 text-white shadow-2xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300">
+        <div id="toast-icon" class="text-emerald-400"><i class="fa-solid fa-circle-check"></i></div>
+        <span id="toast-msg">Success</span>
     </div>
 
-    <!-- JAVASCRIPT APP LOGIC -->
+    <!-- Javascript Logic -->
     <script>
-        // =========================================================================
-        // FIREBASE CLOUD SYNC CONFIGURATION
-        // Paste your Firebase config object below to enable automatic cross-device
-        // cloud sync when hosted on GitHub Pages or any server.
-        // =========================================================================
         const MY_FIREBASE_CONFIG = {
             apiKey: "AIzaSyDfDrFU3W3CVtWpvM059FOtH3US3j--5oQ",
-    authDomain: "myexpensetracker-9ae12.firebaseapp.com",
-    projectId: "myexpensetracker-9ae12",
-    storageBucket: "myexpensetracker-9ae12.firebasestorage.app",
-    messagingSenderId: "150049824216",
-    appId: "1:150049824216:web:2b8439b06e67832ab9e6ad"
+            authDomain: "myexpensetracker-9ae12.firebaseapp.com",
+            projectId: "myexpensetracker-9ae12",
+            storageBucket: "myexpensetracker-9ae12.firebasestorage.app",
+            messagingSenderId: "150049824216",
+            appId: "1:150049824216:web:2b8439b06e67832ab9e6ad"
         };
 
-        // Global Application State & Storage References
         let expenses = [];
         let categoryChartInstance = null;
         let trendChartInstance = null;
@@ -641,17 +439,13 @@
         let currentSort = { field: 'date', direction: 'desc' };
         let activeConfirmCallback = null;
 
-        // User Auth & Cloud/Local State
-        let currentUser = null; // { username, userKey, monthlyBudget, password }
+        let currentUser = null;
         let isSignUpMode = false;
         let db = null;
         let auth = null;
         let expensesUnsubscribe = null;
         let isCloudMode = false;
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'expensight-app';
-
-        // Default Category Color Palette (Light aesthetic)
         const categoryColors = {
             'Food & Dining': { bg: '#fef3c7', text: '#d97706', border: '#fde68a', chart: '#f59e0b' },
             'Transportation': { bg: '#e0f2fe', text: '#0284c7', border: '#bae6fd', chart: '#0284c7' },
@@ -664,21 +458,19 @@
             'Other': { bg: '#f1f5f9', text: '#475569', border: '#e2e8f0', chart: '#64748b' }
         };
 
-        function getRecentDate(daysAgo) {
-            const d = new Date();
-            d.setDate(d.getDate() - daysAgo);
-            return d.toISOString().split('T')[0];
+        function initApp() {
+            initializeDateInput();
+            setupEventListeners();
+            setupFirebaseAndAuth();
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            initializeDateInput();
-            setupGSAPAnimations();
-            setupEventListeners();
-            await setupFirebaseAndAuth();
-        });
+        if (window.FirebaseSDK) {
+            initApp();
+        } else {
+            window.addEventListener('firebase-sdk-ready', initApp);
+        }
 
         function setupEventListeners() {
-            // Auth Tab Switching (Log In vs Create Account)
             const loginTab = document.getElementById('auth-tab-login');
             const signupTab = document.getElementById('auth-tab-signup');
             const confirmPassContainer = document.getElementById('confirm-password-container');
@@ -690,187 +482,105 @@
                     isSignUpMode = false;
                     loginTab.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm';
                     signupTab.className = 'flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
-                    if (confirmPassContainer) confirmPassContainer.classList.add('hidden');
-                    if (authBtnText) authBtnText.innerText = 'Log In';
-                    if (authErrorBox) authErrorBox.classList.add('hidden');
+                    confirmPassContainer.classList.add('hidden');
+                    authBtnText.innerText = 'Log In';
+                    authErrorBox.classList.add('hidden');
                 });
 
                 signupTab.addEventListener('click', () => {
                     isSignUpMode = true;
                     signupTab.className = 'flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-brand-700 shadow-sm';
                     loginTab.className = 'flex-1 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
-                    if (confirmPassContainer) confirmPassContainer.classList.remove('hidden');
-                    if (authBtnText) authBtnText.innerText = 'Create Account';
-                    if (authErrorBox) authErrorBox.classList.add('hidden');
+                    confirmPassContainer.classList.remove('hidden');
+                    authBtnText.innerText = 'Create Account';
+                    authErrorBox.classList.add('hidden');
                 });
             }
 
-            // Auth Form Submission
-            const authForm = document.getElementById('auth-form');
-            if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
+            document.getElementById('auth-form').addEventListener('submit', handleAuthSubmit);
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
 
-            // Logout Button
-            const logoutBtn = document.getElementById('logout-btn');
-            if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+            document.getElementById('open-add-modal-btn').addEventListener('click', () => openExpenseModal());
+            document.getElementById('close-modal-btn').addEventListener('click', closeExpenseModal);
+            document.getElementById('cancel-modal-btn').addEventListener('click', closeExpenseModal);
+            document.getElementById('expense-form').addEventListener('submit', handleFormSubmit);
 
-            // Expense Modals
-            const openAddBtn = document.getElementById('open-add-modal-btn');
-            if (openAddBtn) openAddBtn.addEventListener('click', () => openExpenseModal());
+            document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
+            document.getElementById('import-btn').addEventListener('click', openImportModal);
+            document.getElementById('close-import-modal-btn').addEventListener('click', closeImportModal);
+            document.getElementById('close-import-btn').addEventListener('click', closeImportModal);
+            document.getElementById('download-template-btn').addEventListener('click', downloadSampleExcelTemplate);
 
-            const closeModalBtn = document.getElementById('close-modal-btn');
-            if (closeModalBtn) closeModalBtn.addEventListener('click', closeExpenseModal);
-
-            const cancelModalBtn = document.getElementById('cancel-modal-btn');
-            if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeExpenseModal);
-
-            const expenseForm = document.getElementById('expense-form');
-            if (expenseForm) expenseForm.addEventListener('submit', handleFormSubmit);
-
-            // Excel Import & Export
-            const exportBtn = document.getElementById('export-excel-btn');
-            if (exportBtn) exportBtn.addEventListener('click', exportToExcel);
-
-            const importBtn = document.getElementById('import-btn');
-            if (importBtn) importBtn.addEventListener('click', openImportModal);
-
-            const closeImportModalBtn = document.getElementById('close-import-modal-btn');
-            if (closeImportModalBtn) closeImportModalBtn.addEventListener('click', closeImportModal);
-
-            const closeImportBtn = document.getElementById('close-import-btn');
-            if (closeImportBtn) closeImportBtn.addEventListener('click', closeImportModal);
-
-            const downloadTemplateBtn = document.getElementById('download-template-btn');
-            if (downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', downloadSampleExcelTemplate);
-
-            // Drag & Drop File Upload
             const dropZone = document.getElementById('drop-zone');
             const fileInput = document.getElementById('file-input');
 
             if (dropZone && fileInput) {
                 dropZone.addEventListener('click', () => fileInput.click());
-
-                dropZone.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    dropZone.classList.add('drag-active');
-                });
-
-                dropZone.addEventListener('dragleave', () => {
-                    dropZone.classList.remove('drag-active');
-                });
-
+                dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); });
+                dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
                 dropZone.addEventListener('drop', (e) => {
                     e.preventDefault();
                     dropZone.classList.remove('drag-active');
-                    if (e.dataTransfer.files.length) {
-                        handleExcelImport(e.dataTransfer.files[0]);
-                    }
+                    if (e.dataTransfer.files.length) handleExcelImport(e.dataTransfer.files[0]);
                 });
-
                 fileInput.addEventListener('change', (e) => {
-                    if (e.target.files.length) {
-                        handleExcelImport(e.target.files[0]);
+                    if (e.target.files.length) handleExcelImport(e.target.files[0]);
+                });
+            }
+
+            document.getElementById('search-input').addEventListener('input', renderTable);
+            document.getElementById('filter-category').addEventListener('change', renderTable);
+            document.getElementById('filter-payment').addEventListener('change', renderTable);
+            document.getElementById('reset-filters-btn').addEventListener('click', resetFilters);
+
+            document.getElementById('clear-data-btn').addEventListener('click', () => {
+                showConfirmModal('Clear All Expenses?', 'Are you sure you want to clear all data for this account?', async () => {
+                    await clearUserExpenses();
+                    showToast('All expenses cleared', 'info');
+                });
+            });
+
+            document.getElementById('set-budget-btn').addEventListener('click', async () => {
+                const newCap = prompt('Enter your monthly budget cap ($):', monthlyBudget);
+                if (newCap !== null) {
+                    const parsed = parseFloat(newCap);
+                    if (!isNaN(parsed) && parsed > 0) {
+                        monthlyBudget = parsed;
+                        if (currentUser) await updateUserBudget(parsed);
+                        renderDashboard();
+                        showToast(`Budget updated to $${parsed.toFixed(2)}`, 'success');
+                    } else {
+                        showToast('Please enter a valid positive number.', 'error');
                     }
-                });
-            }
+                }
+            });
 
-            // Search and Filter Listeners
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) searchInput.addEventListener('input', renderTable);
-
-            const filterCat = document.getElementById('filter-category');
-            if (filterCat) filterCat.addEventListener('change', renderTable);
-
-            const filterPay = document.getElementById('filter-payment');
-            if (filterPay) filterPay.addEventListener('change', renderTable);
-
-            const resetFiltersBtn = document.getElementById('reset-filters-btn');
-            if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetFilters);
-
-            const clearDataBtn = document.getElementById('clear-data-btn');
-            if (clearDataBtn) {
-                clearDataBtn.addEventListener('click', () => {
-                    showConfirmModal(
-                        'Clear All Expenses?',
-                        'Are you sure you want to delete all recorded expenses for your account? This action cannot be undone.',
-                        async () => {
-                            await clearUserExpensesFromFirestore();
-                            showToast('All expense data cleared', 'info');
-                        }
-                    );
-                });
-            }
-
-            // Monthly Budget Cap Setting
-            const setBudgetBtn = document.getElementById('set-budget-btn');
-            if (setBudgetBtn) {
-                setBudgetBtn.addEventListener('click', async () => {
-                    const newCap = prompt('Enter your monthly spending budget cap ($):', monthlyBudget);
-                    if (newCap !== null) {
-                        const parsed = parseFloat(newCap);
-                        if (!isNaN(parsed) && parsed > 0) {
-                            monthlyBudget = parsed;
-                            if (currentUser) {
-                                await updateUserBudgetInFirestore(parsed);
-                            }
-                            renderDashboard();
-                            showToast(`Monthly budget set to $${parsed.toFixed(2)}`, 'success');
-                        } else {
-                            showToast('Please enter a valid positive number for budget.', 'error');
-                        }
-                    }
-                });
-            }
-
-            // Confirmation Modal Actions
-            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
-            if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', closeConfirmModal);
-
-            const confirmActionBtn = document.getElementById('confirm-action-btn');
-            if (confirmActionBtn) {
-                confirmActionBtn.addEventListener('click', () => {
-                    if (typeof activeConfirmCallback === 'function') {
-                        activeConfirmCallback();
-                    }
-                    closeConfirmModal();
-                });
-            }
+            document.getElementById('confirm-cancel-btn').addEventListener('click', closeConfirmModal);
+            document.getElementById('confirm-action-btn').addEventListener('click', () => {
+                if (typeof activeConfirmCallback === 'function') activeConfirmCallback();
+                closeConfirmModal();
+            });
         }
 
         async function setupFirebaseAndAuth() {
             try {
-                let firebaseConfig = null;
-                if (typeof __firebase_config !== 'undefined') {
-                    firebaseConfig = JSON.parse(__firebase_config);
-                } else if (MY_FIREBASE_CONFIG && MY_FIREBASE_CONFIG.apiKey) {
-                    firebaseConfig = MY_FIREBASE_CONFIG;
-                }
-
-                if (firebaseConfig && window.FirebaseSDK) {
-                    const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, getFirestore } = window.FirebaseSDK;
-                    const firebaseApp = initializeApp(firebaseConfig);
+                if (MY_FIREBASE_CONFIG && MY_FIREBASE_CONFIG.apiKey && window.FirebaseSDK) {
+                    const { initializeApp, getAuth, signInAnonymously, getFirestore } = window.FirebaseSDK;
+                    const firebaseApp = initializeApp(MY_FIREBASE_CONFIG);
                     db = getFirestore(firebaseApp);
                     auth = getAuth(firebaseApp);
-
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
+                    await signInAnonymously(auth);
                     isCloudMode = true;
-                    
-                    // Update header sync status badge
+
                     const syncBadge = document.getElementById('sync-status-badge');
-                    if (syncBadge) {
-                        syncBadge.innerHTML = `<i class="fa-solid fa-cloud text-emerald-500"></i><span class="text-emerald-700">Cloud Synced</span>`;
-                        syncBadge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold';
-                    }
+                    syncBadge.innerHTML = `<i class="fa-solid fa-cloud text-emerald-500"></i><span class="text-emerald-700">Cloud Synced</span>`;
+                    syncBadge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold';
                 }
             } catch (err) {
-                console.warn("Firebase Auth setup notice (using Local Storage fallback):", err);
+                console.warn("Using local storage fallback:", err);
                 isCloudMode = false;
             }
 
-            // Check for active logged-in user in storage
             const savedUsername = localStorage.getItem('expensight_active_username');
             if (savedUsername) {
                 const userDoc = await getAccountRecord(savedUsername);
@@ -879,39 +589,42 @@
                     return;
                 }
             }
-
-            // Show Login Modal if not logged in
             showAuthModal();
         }
 
-        // --- ACCOUNT DATA ADAPTER (Cloud vs Local) ---
         async function getAccountRecord(username) {
             const cleanUser = username.toLowerCase().trim();
             if (isCloudMode && db) {
-                const { doc, getDoc } = window.FirebaseSDK;
-                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_users', cleanUser);
-                const snap = await getDoc(userRef);
-                return snap.exists() ? snap.data() : null;
-            } else {
-                const localUsers = JSON.parse(localStorage.getItem('expensight_users') || '{}');
-                return localUsers[cleanUser] || null;
+                try {
+                    const { doc, getDoc } = window.FirebaseSDK;
+                    const userRef = doc(db, 'expensight_users', cleanUser);
+                    const snap = await getDoc(userRef);
+                    if (snap.exists()) return snap.data();
+                } catch (e) {
+                    console.warn("Firestore read failed, checking localStorage fallback:", e);
+                }
             }
+            const localUsers = JSON.parse(localStorage.getItem('expensight_users') || '{}');
+            return localUsers[cleanUser] || null;
         }
 
         async function saveAccountRecord(userDoc) {
             const cleanUser = userDoc.username.toLowerCase().trim();
             if (isCloudMode && db) {
-                const { doc, setDoc } = window.FirebaseSDK;
-                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_users', cleanUser);
-                await setDoc(userRef, userDoc);
+                try {
+                    const { doc, setDoc } = window.FirebaseSDK;
+                    const userRef = doc(db, 'expensight_users', cleanUser);
+                    await setDoc(userRef, userDoc);
+                } catch (e) {
+                    console.warn("Firestore save failed, saved locally:", e);
+                }
             }
-            // Always save locally as well for offline/fast fallback
             const localUsers = JSON.parse(localStorage.getItem('expensight_users') || '{}');
             localUsers[cleanUser] = userDoc;
             localStorage.setItem('expensight_users', JSON.stringify(localUsers));
         }
 
-        async function updateUserBudgetInFirestore(newBudget) {
+        async function updateUserBudget(newBudget) {
             currentUser.monthlyBudget = newBudget;
             await saveAccountRecord(currentUser);
         }
@@ -919,7 +632,7 @@
         function subscribeToUserExpenses() {
             if (isCloudMode && db && currentUser) {
                 const { collection, onSnapshot } = window.FirebaseSDK;
-                const expensesRef = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
+                const expensesRef = collection(db, 'expensight_expenses');
 
                 if (expensesUnsubscribe) expensesUnsubscribe();
 
@@ -934,7 +647,7 @@
                     expenses = userExpenses;
                     renderDashboard();
                 }, (error) => {
-                    console.error("Firestore sync error, falling back to local storage:", error);
+                    console.warn("Snapshot fallback to local storage:", error);
                     loadLocalExpenses();
                 });
             } else {
@@ -949,38 +662,40 @@
             renderDashboard();
         }
 
-        async function saveExpenseToFirestore(expenseData) {
+        async function saveExpense(expenseData) {
             if (!currentUser) return;
             const fullExpense = { ...expenseData, userKey: currentUser.userKey };
 
             if (isCloudMode && db) {
-                const { doc, setDoc } = window.FirebaseSDK;
-                const expRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', expenseData.id);
-                await setDoc(expRef, fullExpense);
+                try {
+                    const { doc, setDoc } = window.FirebaseSDK;
+                    const expRef = doc(db, 'expensight_expenses', expenseData.id);
+                    await setDoc(expRef, fullExpense);
+                } catch (e) {
+                    console.warn("Cloud save failed, saving locally:", e);
+                }
             }
 
-            // Save to LocalStorage for instant local sync
             const key = `expensight_data_${currentUser.userKey}`;
             const localList = JSON.parse(localStorage.getItem(key) || '[]');
             const idx = localList.findIndex(e => e.id === expenseData.id);
-            if (idx >= 0) {
-                localList[idx] = fullExpense;
-            } else {
-                localList.push(fullExpense);
-            }
+            if (idx >= 0) localList[idx] = fullExpense;
+            else localList.push(fullExpense);
             localStorage.setItem(key, JSON.stringify(localList));
 
-            if (!isCloudMode) {
-                loadLocalExpenses();
-            }
+            if (!isCloudMode) loadLocalExpenses();
         }
 
-        async function deleteExpenseFromFirestore(id) {
+        async function deleteExpense(id) {
             if (!currentUser) return;
             if (isCloudMode && db) {
-                const { doc, deleteDoc } = window.FirebaseSDK;
-                const expRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
-                await deleteDoc(expRef);
+                try {
+                    const { doc, deleteDoc } = window.FirebaseSDK;
+                    const expRef = doc(db, 'expensight_expenses', id);
+                    await deleteDoc(expRef);
+                } catch (e) {
+                    console.warn("Cloud delete failed:", e);
+                }
             }
 
             const key = `expensight_data_${currentUser.userKey}`;
@@ -988,19 +703,17 @@
             localList = localList.filter(e => e.id !== id);
             localStorage.setItem(key, JSON.stringify(localList));
 
-            if (!isCloudMode) {
-                loadLocalExpenses();
-            }
+            if (!isCloudMode) loadLocalExpenses();
         }
 
-        async function clearUserExpensesFromFirestore() {
+        async function clearUserExpenses() {
             if (!currentUser) return;
             if (isCloudMode && db) {
-                expenses.forEach(async (exp) => {
+                for (const exp of expenses) {
                     const { doc, deleteDoc } = window.FirebaseSDK;
-                    const expRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', exp.id);
+                    const expRef = doc(db, 'expensight_expenses', exp.id);
                     await deleteDoc(expRef);
-                });
+                }
             }
             const key = `expensight_data_${currentUser.userKey}`;
             localStorage.removeItem(key);
@@ -1008,7 +721,6 @@
             renderDashboard();
         }
 
-        // --- AUTH & MODAL HANDLERS ---
         async function handleAuthSubmit(e) {
             e.preventDefault();
             const usernameInput = document.getElementById('auth-username').value.trim().toLowerCase();
@@ -1041,7 +753,7 @@
 
                     const existingUser = await getAccountRecord(usernameInput);
                     if (existingUser) {
-                        errorMsg.innerText = "Username already exists. Please log in or choose another.";
+                        errorMsg.innerText = "Username already exists. Please choose another or log in.";
                         errorBox.classList.remove('hidden');
                         return;
                     }
@@ -1088,7 +800,6 @@
             monthlyBudget = userDoc.monthlyBudget || 2500;
             localStorage.setItem('expensight_active_username', userDoc.username);
 
-            // Update UI Header Profile
             document.getElementById('header-username').innerText = userDoc.username;
             document.getElementById('user-profile-badge').classList.remove('hidden');
 
@@ -1097,23 +808,19 @@
         }
 
         function handleLogout() {
-            showConfirmModal(
-                'Log Out?',
-                'Are you sure you want to log out of your account?',
-                () => {
-                    currentUser = null;
-                    expenses = [];
-                    localStorage.removeItem('expensight_active_username');
-                    if (expensesUnsubscribe) {
-                        expensesUnsubscribe();
-                        expensesUnsubscribe = null;
-                    }
-                    document.getElementById('user-profile-badge').classList.add('hidden');
-                    renderDashboard();
-                    showAuthModal();
-                    showToast('Logged out successfully', 'info');
+            showConfirmModal('Log Out?', 'Are you sure you want to log out?', () => {
+                currentUser = null;
+                expenses = [];
+                localStorage.removeItem('expensight_active_username');
+                if (expensesUnsubscribe) {
+                    expensesUnsubscribe();
+                    expensesUnsubscribe = null;
                 }
-            );
+                document.getElementById('user-profile-badge').classList.add('hidden');
+                renderDashboard();
+                showAuthModal();
+                showToast('Logged out successfully', 'info');
+            });
         }
 
         function showAuthModal() {
@@ -1128,89 +835,8 @@
             modal.classList.remove('opacity-100');
         }
 
-        async function getAccountFromFirestore(username) {
-            if (!db) return null;
-            const { doc, getDoc } = window.FirebaseSDK;
-            const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_users', username.toLowerCase());
-            const snap = await getDoc(userRef);
-            return snap.exists() ? snap.data() : null;
-        }
-
-        async function saveAccountToFirestore(userDoc) {
-            if (!db) return;
-            const { doc, setDoc } = window.FirebaseSDK;
-            const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_users', userDoc.username.toLowerCase());
-            await setDoc(userRef, userDoc);
-        }
-
-        async function updateUserBudgetInFirestore(newBudget) {
-            if (!db || !currentUser) return;
-            const { doc, updateDoc } = window.FirebaseSDK;
-            const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_users', currentUser.username.toLowerCase());
-            await updateDoc(userRef, { monthlyBudget: newBudget });
-            currentUser.monthlyBudget = newBudget;
-        }
-
-        function subscribeToUserExpenses() {
-            if (!db || !currentUser) return;
-            const { collection, onSnapshot } = window.FirebaseSDK;
-            const expensesRef = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
-
-            if (expensesUnsubscribe) expensesUnsubscribe();
-
-            expensesUnsubscribe = onSnapshot(expensesRef, (snapshot) => {
-                const userExpenses = [];
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    if (data && data.userKey === currentUser.userKey) {
-                        userExpenses.push({ id: docSnap.id, ...data });
-                    }
-                });
-                expenses = userExpenses;
-                renderDashboard();
-            }, (error) => {
-                console.error("Firestore sync error:", error);
-            });
-        }
-
-        async function saveExpenseToFirestore(expenseData) {
-            if (!db || !currentUser) return;
-            const { doc, setDoc } = window.FirebaseSDK;
-            const expRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', expenseData.id);
-            await setDoc(expRef, {
-                ...expenseData,
-                userKey: currentUser.userKey
-            });
-        }
-
-        async function deleteExpenseFromFirestore(id) {
-            if (!db) return;
-            const { doc, deleteDoc } = window.FirebaseSDK;
-            const expRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
-            await deleteDoc(expRef);
-        }
-
-        async function clearUserExpensesFromFirestore() {
-            if (!db || !currentUser) return;
-            expenses.forEach(async (exp) => {
-                await deleteExpenseFromFirestore(exp.id);
-            });
-        }
-
         function initializeDateInput() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('form-date').value = today;
-        }
-
-        function setupGSAPAnimations() {
-            gsap.from('header', { y: -50, opacity: 0, duration: 0.8, ease: 'power3.out' });
-            gsap.from('.stat-card', {
-                y: 30,
-                opacity: 0,
-                duration: 0.7,
-                stagger: 0.1,
-                ease: 'back.out(1.2)'
-            });
+            document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
         }
 
         function renderDashboard() {
@@ -1221,23 +847,17 @@
 
         function calculateStats() {
             const total = expenses.reduce((sum, item) => sum + item.amount, 0);
-            
-            // Stat 1: Total Spent
-            animateNumber('stat-total-spent', total);
+            document.getElementById('stat-total-spent').innerText = `$${total.toFixed(2)}`;
             document.getElementById('stat-record-count').innerText = `${expenses.length} expenses recorded`;
 
-            // Stat 2: Daily Average
             const uniqueDates = new Set(expenses.map(e => e.date));
             const activeDays = uniqueDates.size || 1;
             const dailyAvg = total / activeDays;
-            animateNumber('stat-daily-avg', dailyAvg);
+            document.getElementById('stat-daily-avg').innerText = `$${dailyAvg.toFixed(2)}`;
             document.getElementById('stat-active-days').innerText = `Across ${activeDays} active day(s)`;
 
-            // Stat 3: Top Category
             const catMap = {};
-            expenses.forEach(e => {
-                catMap[e.category] = (catMap[e.category] || 0) + e.amount;
-            });
+            expenses.forEach(e => { catMap[e.category] = (catMap[e.category] || 0) + e.amount; });
 
             let topCat = 'None';
             let topCatAmt = 0;
@@ -1251,9 +871,8 @@
             document.getElementById('stat-top-category').innerText = topCat;
             document.getElementById('stat-top-cat-amount').innerText = `$${topCatAmt.toFixed(2)} spent in category`;
 
-            // Stat 4: Budget Progress
             document.getElementById('stat-budget-spent').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('stat-budget-limit').innerText = `of $${monthlyBudget.toLocaleString()} budget`;
+            document.getElementById('stat-budget-limit').innerText = `of $${monthlyBudget.toLocaleString()}`;
             
             const budgetPct = Math.min((total / monthlyBudget) * 100, 100);
             const progressBar = document.getElementById('budget-progress-bar');
@@ -1263,31 +882,12 @@
             if (total > monthlyBudget) {
                 progressBar.className = 'h-full bg-rose-500 rounded-full transition-all duration-500';
                 statusText.className = 'text-xs font-medium text-rose-600 mt-2 flex items-center gap-1';
-                statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Exceeded by $${(total - monthlyBudget).toFixed(2)}`;
-            } else if (budgetPct > 80) {
-                progressBar.className = 'h-full bg-amber-500 rounded-full transition-all duration-500';
-                statusText.className = 'text-xs font-medium text-amber-600 mt-2 flex items-center gap-1';
-                statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Warning: Near budget cap (${budgetPct.toFixed(0)}%)`;
+                statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Over budget by $${(total - monthlyBudget).toFixed(2)}`;
             } else {
                 progressBar.className = 'h-full bg-brand-500 rounded-full transition-all duration-500';
                 statusText.className = 'text-xs font-medium text-emerald-600 mt-2 flex items-center gap-1';
-                statusText.innerHTML = `<i class="fa-solid fa-circle-check"></i> Within safe spending limit (${budgetPct.toFixed(0)}%)`;
+                statusText.innerHTML = `<i class="fa-solid fa-circle-check"></i> Within budget limit`;
             }
-        }
-
-        function animateNumber(elementId, value) {
-            const el = document.getElementById(elementId);
-            const currentVal = parseFloat(el.innerText.replace('$', '').replace(',', '')) || 0;
-            const obj = { val: currentVal };
-            
-            gsap.to(obj, {
-                val: value,
-                duration: 0.8,
-                ease: 'power2.out',
-                onUpdate: () => {
-                    el.innerText = `$${obj.val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                }
-            });
         }
 
         function getFilteredExpenses() {
@@ -1303,7 +903,6 @@
             }).sort((a, b) => {
                 let valA = a[currentSort.field];
                 let valB = b[currentSort.field];
-
                 if (currentSort.field === 'amount') {
                     return currentSort.direction === 'asc' ? valA - valB : valB - valA;
                 } else {
@@ -1327,41 +926,28 @@
                 emptyState.classList.remove('hidden');
             } else {
                 emptyState.classList.add('hidden');
-
                 filtered.forEach(item => {
                     const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50/80 transition-colors group';
-                    tr.id = `row-${item.id}`;
-
+                    tr.className = 'hover:bg-slate-50/80 transition-colors';
                     const catStyle = categoryColors[item.category] || categoryColors['Other'];
 
                     tr.innerHTML = `
-                        <td class="py-3.5 px-5 text-xs text-slate-600 font-medium whitespace-nowrap">
-                            ${formatDate(item.date)}
-                        </td>
+                        <td class="py-3.5 px-5 text-xs text-slate-600 font-medium whitespace-nowrap">${item.date}</td>
                         <td class="py-3.5 px-5 whitespace-nowrap">
                             <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block border" 
                                   style="background-color: ${catStyle.bg}; color: ${catStyle.text}; border-color: ${catStyle.border}">
                                 ${item.category}
                             </span>
                         </td>
-                        <td class="py-3.5 px-5 font-medium text-slate-800 text-sm">
-                            ${escapeHTML(item.description)}
-                        </td>
-                        <td class="py-3.5 px-5 text-xs text-slate-500 whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5">
-                                <i class="${getPaymentIcon(item.payment)} text-slate-400"></i> ${item.payment}
-                            </span>
-                        </td>
-                        <td class="py-3.5 px-5 text-right font-bold text-slate-800 whitespace-nowrap">
-                            $${item.amount.toFixed(2)}
-                        </td>
+                        <td class="py-3.5 px-5 font-medium text-slate-800 text-sm">${escapeHTML(item.description)}</td>
+                        <td class="py-3.5 px-5 text-xs text-slate-500 whitespace-nowrap">${item.payment}</td>
+                        <td class="py-3.5 px-5 text-right font-bold text-slate-800 whitespace-nowrap">$${item.amount.toFixed(2)}</td>
                         <td class="py-3.5 px-5 text-center whitespace-nowrap">
-                            <div class="flex items-center justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                                <button onclick="editExpense('${item.id}')" title="Edit" class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-brand-600 hover:border-brand-200 flex items-center justify-center transition-all">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="editExpense('${item.id}')" title="Edit" class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-brand-600 flex items-center justify-center">
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </button>
-                                <button onclick="confirmDeleteExpense('${item.id}')" title="Delete" class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-rose-600 hover:border-rose-200 flex items-center justify-center transition-all">
+                                <button onclick="confirmDeleteExpense('${item.id}')" title="Delete" class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-rose-600 flex items-center justify-center">
                                     <i class="fa-solid fa-trash text-xs"></i>
                                 </button>
                             </div>
@@ -1371,23 +957,9 @@
                 });
             }
 
-            // Update Summary Bar
             const filteredTotal = filtered.reduce((sum, item) => sum + item.amount, 0);
             document.getElementById('table-summary-count').innerText = `Showing ${filtered.length} of ${expenses.length} entries`;
             document.getElementById('filtered-total-amount').innerText = `$${filteredTotal.toFixed(2)}`;
-
-            // Filter status badge
-            const catFilter = document.getElementById('filter-category').value;
-            const payFilter = document.getElementById('filter-payment').value;
-            const searchVal = document.getElementById('search-input').value;
-            
-            if (catFilter !== 'ALL' || payFilter !== 'ALL' || searchVal) {
-                document.getElementById('filtered-badge').innerText = 'Filtered';
-                document.getElementById('filtered-badge').className = 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-100 text-brand-700';
-            } else {
-                document.getElementById('filtered-badge').innerText = 'Showing all';
-                document.getElementById('filtered-badge').className = 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700';
-            }
         }
 
         function sortTable(field) {
@@ -1409,123 +981,53 @@
         }
 
         function updateCharts() {
-            // Category Chart
             const catMap = {};
-            expenses.forEach(e => {
-                catMap[e.category] = (catMap[e.category] || 0) + e.amount;
-            });
+            expenses.forEach(e => { catMap[e.category] = (catMap[e.category] || 0) + e.amount; });
 
             const catLabels = Object.keys(catMap);
             const catData = Object.values(catMap);
-            
             const emptyData = catLabels.length === 0;
-            const displayLabels = emptyData ? ['No Data Yet'] : catLabels;
-            const displayData = emptyData ? [1] : catData;
-            const catColors = emptyData ? ['#e2e8f0'] : catLabels.map(label => (categoryColors[label] ? categoryColors[label].chart : '#64748b'));
 
             const catCtx = document.getElementById('categoryChart').getContext('2d');
-            
-            if (categoryChartInstance) {
-                categoryChartInstance.destroy();
-            }
+            if (categoryChartInstance) categoryChartInstance.destroy();
 
             categoryChartInstance = new Chart(catCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: displayLabels,
+                    labels: emptyData ? ['No Data'] : catLabels,
                     datasets: [{
-                        data: displayData,
-                        backgroundColor: catColors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: emptyData ? 0 : 6
+                        data: emptyData ? [1] : catData,
+                        backgroundColor: emptyData ? ['#e2e8f0'] : catLabels.map(l => categoryColors[l]?.chart || '#64748b')
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                font: { family: 'Inter', size: 11 },
-                                boxWidth: 12,
-                                usePointStyle: true,
-                                padding: 12
-                            }
-                        },
-                        tooltip: {
-                            enabled: !emptyData,
-                            callbacks: {
-                                label: function(context) {
-                                    const val = context.raw || 0;
-                                    return ` $${val.toFixed(2)}`;
-                                }
-                            }
-                        }
-                    },
-                    cutout: '70%'
-                }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
             });
 
-            // Spending Trend Chart
             const dateMap = {};
-            const sortedExpenses = [...expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
-            
-            sortedExpenses.forEach(e => {
-                dateMap[e.date] = (dateMap[e.date] || 0) + e.amount;
-            });
+            const sorted = [...expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
+            sorted.forEach(e => { dateMap[e.date] = (dateMap[e.date] || 0) + e.amount; });
 
             const dateLabels = Object.keys(dateMap).slice(-10);
             const dateData = dateLabels.map(d => dateMap[d]);
 
             const trendCtx = document.getElementById('trendChart').getContext('2d');
-
-            if (trendChartInstance) {
-                trendChartInstance.destroy();
-            }
+            if (trendChartInstance) trendChartInstance.destroy();
 
             trendChartInstance = new Chart(trendCtx, {
                 type: 'bar',
                 data: {
-                    labels: dateLabels.length > 0 ? dateLabels.map(d => formatDateShort(d)) : ['No Expense Records Yet'],
+                    labels: dateLabels.length > 0 ? dateLabels : ['No Records'],
                     datasets: [{
-                        label: 'Daily Expenditure ($)',
                         data: dateData.length > 0 ? dateData : [0],
                         backgroundColor: '#14b8a6',
-                        hoverBackgroundColor: '#0d9488',
-                        borderRadius: 8,
-                        borderSkipped: false
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            enabled: dateData.length > 0,
-                            callbacks: {
-                                label: function(context) {
-                                    return ` Total: $${context.raw.toFixed(2)}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Inter', size: 11 } }
-                        },
-                        y: {
-                            grid: { color: '#f1f5f9' },
-                            beginAtZero: true,
-                            ticks: { 
-                                font: { family: 'Inter', size: 11 },
-                                callback: value => `$${value}`
-                            }
-                        }
-                    }
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
                 }
             });
         }
@@ -1536,139 +1038,82 @@
                 return;
             }
 
-            try {
-                const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
-                const uniqueDates = new Set(expenses.map(e => e.date)).size || 1;
-                
-                const catSummary = {};
-                expenses.forEach(e => {
-                    catSummary[e.category] = (catSummary[e.category] || 0) + e.amount;
-                });
+            const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
+            const summaryRows = [
+                [`ExpenSight Pro - Financial Summary (${currentUser ? currentUser.username : 'User'})`],
+                ["Exported Date", new Date().toLocaleString()],
+                ["Total Expenses Recorded", expenses.length],
+                ["Total Amount Spent", `$${totalSpent.toFixed(2)}`],
+                ["Monthly Budget Cap", `$${monthlyBudget.toFixed(2)}`]
+            ];
 
-                const summaryRows = [
-                    [`ExpenSight Pro - Financial Summary (${currentUser ? currentUser.username : 'User'})`],
-                    ["Generated Date", new Date().toLocaleString()],
-                    ["Total Expenses Recorded", expenses.length],
-                    ["Total Amount Spent", `$${totalSpent.toFixed(2)}`],
-                    ["Daily Average", `$${(totalSpent / uniqueDates).toFixed(2)}`],
-                    ["Monthly Budget Cap", `$${monthlyBudget.toFixed(2)}`],
-                    ["Budget Variance", totalSpent > monthlyBudget ? `Over by $${(totalSpent - monthlyBudget).toFixed(2)}` : `Under by $${(monthlyBudget - totalSpent).toFixed(2)}`],
-                    [],
-                    ["Category Breakdown Summary"],
-                    ["Category", "Total Spent ($)", "% of Total"]
-                ];
+            const summarySheet = XLSX.utils.aoa_to_sheet(summaryRows);
+            const detailedRows = expenses.map(item => ({
+                "ID": item.id,
+                "Date": item.date,
+                "Category": item.category,
+                "Description": item.description,
+                "Payment Method": item.payment,
+                "Amount ($)": item.amount
+            }));
 
-                Object.keys(catSummary).forEach(cat => {
-                    const amt = catSummary[cat];
-                    const pct = ((amt / totalSpent) * 100).toFixed(1) + '%';
-                    summaryRows.push([cat, amt.toFixed(2), pct]);
-                });
+            const detailedSheet = XLSX.utils.json_to_sheet(detailedRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, summarySheet, "Summary");
+            XLSX.utils.book_append_sheet(wb, detailedSheet, "Expenses");
 
-                const summarySheet = XLSX.utils.aoa_to_sheet(summaryRows);
-                summarySheet['!cols'] = [{ wch: 30 }, { wch: 22 }, { wch: 18 }];
-
-                const detailedRows = expenses.map(item => ({
-                    "ID": item.id,
-                    "Date": item.date,
-                    "Category": item.category,
-                    "Description": item.description,
-                    "Payment Method": item.payment,
-                    "Amount ($)": item.amount
-                }));
-
-                const detailedSheet = XLSX.utils.json_to_sheet(detailedRows);
-                detailedSheet['!cols'] = [{ wch: 10 }, { wch: 14 }, { wch: 20 }, { wch: 35 }, { wch: 18 }, { wch: 14 }];
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, summarySheet, "Summary Dashboard");
-                XLSX.utils.book_append_sheet(wb, detailedSheet, "Itemized Expenses");
-
-                const fileName = `Expenses_${currentUser ? currentUser.username : 'Report'}_${new Date().toISOString().split('T')[0]}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-
-                confetti({ particleCount: 70, spread: 60, origin: { y: 0.8 } });
-                showToast('Excel report generated & downloaded!', 'success');
-            } catch (err) {
-                console.error("Excel Export Error:", err);
-                showToast('Failed to generate Excel file.', 'error');
-            }
+            XLSX.writeFile(wb, `Expenses_${currentUser ? currentUser.username : 'Report'}_${new Date().toISOString().split('T')[0]}.xlsx`);
+            confetti({ particleCount: 50, spread: 60 });
+            showToast('Excel report generated!', 'success');
         }
 
         async function handleExcelImport(file) {
             const reader = new FileReader();
-
             reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
-                    if (!jsonData || jsonData.length === 0) {
-                        showToast('Imported file appears to be empty.', 'error');
-                        return;
-                    }
-
-                    let importedCount = 0;
+                    let count = 0;
                     for (const row of jsonData) {
-                        const date = row['Date'] || row['date'] || getRecentDate(0);
-                        const category = row['Category'] || row['category'] || 'Other';
-                        const description = row['Description'] || row['description'] || row['Desc'] || 'Imported Expense';
-                        const payment = row['Payment Method'] || row['Payment'] || row['payment'] || 'Credit Card';
-                        const rawAmount = row['Amount ($)'] || row['Amount'] || row['amount'] || 0;
-                        const amount = parseFloat(rawAmount.toString().replace('$', '').replace(',', '')) || 0;
-
+                        const amount = parseFloat((row['Amount ($)'] || row['Amount'] || 0).toString().replace('$', '')) || 0;
                         if (amount > 0) {
-                            const newExp = {
+                            await saveExpense({
                                 id: Date.now().toString() + Math.random().toString(36).substring(2, 5),
-                                date: date,
-                                category: categoryColors[category] ? category : 'Other',
-                                description: description,
-                                amount: amount,
-                                payment: payment
-                            };
-                            await saveExpenseToFirestore(newExp);
-                            importedCount++;
+                                date: row['Date'] || new Date().toISOString().split('T')[0],
+                                category: row['Category'] || 'Other',
+                                description: row['Description'] || 'Imported Expense',
+                                payment: row['Payment Method'] || 'Credit Card',
+                                amount: amount
+                            });
+                            count++;
                         }
                     }
-
-                    if (importedCount > 0) {
-                        closeImportModal();
-                        showToast(`Successfully imported ${importedCount} expenses to cloud!`, 'success');
-                    } else {
-                        showToast('Could not extract valid expenses. Check column names.', 'error');
-                    }
-
+                    closeImportModal();
+                    showToast(`Imported ${count} expenses!`, 'success');
                 } catch (err) {
-                    console.error("Excel Import Error:", err);
-                    showToast('Error parsing Excel spreadsheet.', 'error');
+                    showToast('Failed to parse Excel file', 'error');
                 }
             };
-
             reader.readAsArrayBuffer(file);
         }
 
         function downloadSampleExcelTemplate() {
             const sampleData = [
-                { Date: "2026-08-10", Category: "Food & Dining", Description: "Lunch with clients", "Payment Method": "Credit Card", "Amount ($)": 45.50 },
-                { Date: "2026-08-11", Category: "Transportation", Description: "Fuel for car", "Payment Method": "Debit Card", "Amount ($)": 60.00 },
-                { Date: "2026-08-11", Category: "Shopping", Description: "Office Supplies", "Payment Method": "UPI / Bank", "Amount ($)": 24.99 }
+                { Date: "2026-08-10", Category: "Food & Dining", Description: "Team Lunch", "Payment Method": "Credit Card", "Amount ($)": 45.50 }
             ];
-
             const ws = XLSX.utils.json_to_sheet(sampleData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Sample Expenses");
-            XLSX.writeFile(wb, "ExpenSight_Sample_Template.xlsx");
+            XLSX.utils.book_append_sheet(wb, ws, "Sample");
+            XLSX.writeFile(wb, "Sample_Expense_Template.xlsx");
         }
 
         function openExpenseModal(expenseToEdit = null) {
             const modal = document.getElementById('expense-modal');
-            const card = document.getElementById('expense-modal-card');
-            const title = document.getElementById('modal-title');
-
             if (expenseToEdit) {
-                title.innerText = 'Edit Expense';
+                document.getElementById('modal-title').innerText = 'Edit Expense';
                 document.getElementById('expense-id').value = expenseToEdit.id;
                 document.getElementById('form-amount').value = expenseToEdit.amount;
                 document.getElementById('form-description').value = expenseToEdit.description;
@@ -1676,34 +1121,23 @@
                 document.getElementById('form-payment').value = expenseToEdit.payment;
                 document.getElementById('form-date').value = expenseToEdit.date;
             } else {
-                title.innerText = 'Add New Expense';
+                document.getElementById('modal-title').innerText = 'Add New Expense';
                 document.getElementById('expense-form').reset();
                 document.getElementById('expense-id').value = '';
                 initializeDateInput();
             }
-
             modal.classList.remove('pointer-events-none');
-            gsap.to(modal, { opacity: 1, duration: 0.25 });
-            gsap.to(card, { scale: 1, duration: 0.3, ease: 'back.out(1.4)' });
+            modal.classList.add('opacity-100');
         }
 
         function closeExpenseModal() {
             const modal = document.getElementById('expense-modal');
-            const card = document.getElementById('expense-modal-card');
-
-            gsap.to(card, { scale: 0.9, duration: 0.2 });
-            gsap.to(modal, {
-                opacity: 0,
-                duration: 0.25,
-                onComplete: () => {
-                    modal.classList.add('pointer-events-none');
-                }
-            });
+            modal.classList.add('pointer-events-none');
+            modal.classList.remove('opacity-100');
         }
 
         async function handleFormSubmit(e) {
             e.preventDefault();
-
             const id = document.getElementById('expense-id').value || (Date.now().toString() + Math.random().toString(36).substring(2, 5));
             const amount = parseFloat(document.getElementById('form-amount').value);
             const description = document.getElementById('form-description').value.trim();
@@ -1711,124 +1145,66 @@
             const payment = document.getElementById('form-payment').value;
             const date = document.getElementById('form-date').value;
 
-            const expenseObj = { id, amount, description, category, payment, date };
-
-            await saveExpenseToFirestore(expenseObj);
-            showToast('Expense saved to cloud!', 'success');
+            await saveExpense({ id, amount, description, category, payment, date });
+            showToast('Expense saved!', 'success');
             closeExpenseModal();
         }
 
         function editExpense(id) {
             const item = expenses.find(e => e.id === id);
-            if (item) {
-                openExpenseModal(item);
-            }
+            if (item) openExpenseModal(item);
         }
 
         function confirmDeleteExpense(id) {
-            showConfirmModal(
-                'Delete Expense?',
-                'Are you sure you want to remove this expense entry from your logs?',
-                async () => {
-                    await deleteExpenseFromFirestore(id);
-                    showToast('Expense entry deleted', 'info');
-                }
-            );
+            showConfirmModal('Delete Expense?', 'Are you sure you want to remove this record?', async () => {
+                await deleteExpense(id);
+                showToast('Expense deleted', 'info');
+            });
         }
 
         function openImportModal() {
             const modal = document.getElementById('import-modal');
-            const card = document.getElementById('import-modal-card');
             modal.classList.remove('pointer-events-none');
-            gsap.to(modal, { opacity: 1, duration: 0.25 });
-            gsap.to(card, { scale: 1, duration: 0.3, ease: 'back.out(1.4)' });
+            modal.classList.add('opacity-100');
         }
 
         function closeImportModal() {
             const modal = document.getElementById('import-modal');
-            const card = document.getElementById('import-modal-card');
-            gsap.to(card, { scale: 0.9, duration: 0.2 });
-            gsap.to(modal, {
-                opacity: 0,
-                duration: 0.25,
-                onComplete: () => {
-                    modal.classList.add('pointer-events-none');
-                }
-            });
+            modal.classList.add('pointer-events-none');
+            modal.classList.remove('opacity-100');
         }
 
         function showConfirmModal(title, message, onConfirm) {
             document.getElementById('confirm-title').innerText = title;
             document.getElementById('confirm-msg').innerText = message;
             activeConfirmCallback = onConfirm;
-
             const modal = document.getElementById('confirm-modal');
             modal.classList.remove('pointer-events-none');
-            gsap.to(modal, { opacity: 1, duration: 0.2 });
+            modal.classList.add('opacity-100');
         }
 
         function closeConfirmModal() {
             const modal = document.getElementById('confirm-modal');
-            gsap.to(modal, {
-                opacity: 0,
-                duration: 0.2,
-                onComplete: () => {
-                    modal.classList.add('pointer-events-none');
-                    activeConfirmCallback = null;
-                }
-            });
+            modal.classList.add('pointer-events-none');
+            modal.classList.remove('opacity-100');
+            activeConfirmCallback = null;
         }
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-msg');
-            const toastIcon = document.getElementById('toast-icon');
+            document.getElementById('toast-msg').innerText = message;
+            const icon = document.getElementById('toast-icon');
 
-            toastMsg.innerText = message;
+            if (type === 'error') icon.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-400"></i>';
+            else if (type === 'info') icon.innerHTML = '<i class="fa-solid fa-circle-info text-blue-400"></i>';
+            else icon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
 
-            if (type === 'error') {
-                toastIcon.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-400"></i>';
-            } else if (type === 'info') {
-                toastIcon.innerHTML = '<i class="fa-solid fa-circle-info text-blue-400"></i>';
-            } else {
-                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
-            }
-
-            gsap.to(toast, { y: -20, opacity: 1, duration: 0.3, ease: 'power2.out' });
-
-            setTimeout(() => {
-                gsap.to(toast, { y: 20, opacity: 0, duration: 0.3, ease: 'power2.in' });
-            }, 3000);
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const [year, month, day] = dateStr.split('-');
-            const date = new Date(year, month - 1, day);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-
-        function formatDateShort(dateStr) {
-            if (!dateStr) return '';
-            const [year, month, day] = dateStr.split('-');
-            const date = new Date(year, month - 1, day);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        }
-
-        function getPaymentIcon(method) {
-            switch (method) {
-                case 'Credit Card': return 'fa-solid fa-credit-card';
-                case 'Debit Card': return 'fa-solid fa-id-card';
-                case 'UPI / Bank': return 'fa-solid fa-building-columns';
-                case 'Cash': return 'fa-solid fa-money-bill-wave';
-                default: return 'fa-solid fa-receipt';
-            }
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
         }
 
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
+            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
     </script>
 </body>
